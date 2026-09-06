@@ -113,10 +113,13 @@ combined peak. Timings are sensitive to machine activity; rerun the harness.
 
 ## Callback and view caching
 
-The normal bridge caches native callbacks once per fit and keeps eight typed
-array view slots, keyed by the current buffer, pointer and length. The
-`bridgeCache` benchmark option accepts `none`, `callbacks` or default `views`.
-It changes bridge bookkeeping only; memories and copies remain separate.
+The normal bridge caches native callbacks once per fit (`bridgeCache: 'callbacks'`).
+The experimental `views` option also keeps eight typed array view slots, keyed
+by the current buffer, pointer and length; `none` disables both caches.
+View caching is opt-in because the available MMM measurements do not establish
+an end-to-end benefit. These options change bridge bookkeeping only; memories
+and copies remain separate. The measurements below retain their explicit modes
+and remain valid after changing the default.
 
 `node benchmarks/build-bridge-callback.mjs` rebuilds the tiny actual WASM
 callback fixture from `bridge-callback.rs`. Run

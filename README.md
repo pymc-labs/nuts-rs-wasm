@@ -199,8 +199,11 @@ guarantee. All runtime and artifact URLs must be fetchable by the application.
 Continuous, fully Numba-compilable graphs only. Shared data are frozen when
 compiled; changes require recompilation. Expanded values currently use float64.
 The Rust and Python modules have separate memories; the JS bridge copies inputs
-and outputs. It resolves callbacks once per fit and reuses a bounded set of
-views, refreshing them when pointers, lengths or either memory buffer change. No Python executes per logp or expansion evaluation.
+and outputs. By default it resolves callbacks once per fit (`bridgeCache: 'callbacks'`).
+View caching is experimental and opt-in with `bridgeCache: 'views'`: it reuses
+a bounded set of views, refreshing them when pointers, lengths or either memory
+buffer change. Current MMM measurements do not establish an end-to-end benefit
+from view caching. Use `bridgeCache: 'none'` to disable both caches. No Python executes per logp or expansion evaluation.
 
 Diagonal-mass NUTS, max depth 10, sequential chains, initial positions from PyMC,
 seeds `seed + chain`. No jitter retries, Stan/JAX/flows, multi-worker chains or
