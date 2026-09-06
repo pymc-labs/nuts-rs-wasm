@@ -1,0 +1,8 @@
+{
+  "base_wheel": "https://files.pythonhosted.org/packages/a8/4d/6107e18af80f4008b76e09ed6032ebe4c67a8484d60fb19b103ba73d5468/pytensor-3.2.4-py2.py3-none-any.whl",
+  "base_sha256": "1befbb3755fdf78df1c9cb61fb0bf6f473e781ded6b80e2fd32b06b5983659fb",
+  "upstream_commit": "f079760a2cbbb78436d91aaf79bf7ec605b5f243",
+  "local_patch": "patches/pytensor-core-shape-intp.patch",
+  "version": "3.2.4+wasm.3",
+  "output_sha256": "e91bc0bab01d9f060cb96b62b2a2fddf3db1cc3fdaeda0539fa080933c0f4c21"
+}

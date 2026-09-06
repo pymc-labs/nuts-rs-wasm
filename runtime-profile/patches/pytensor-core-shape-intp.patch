@@ -1,0 +1,37 @@
+--- a/pytensor/link/numba/dispatch/vectorize_codegen.py
++++ b/pytensor/link/numba/dispatch/vectorize_codegen.py
+@@ -1038,11 +1038,31 @@
+ 
+         constant_inputs = cgutils.unpack_tuple(builder, constant_inputs)
+         all_outer = cgutils.unpack_tuple(builder, outer_inputs)
++        # PyTensor shape scalars can be int64 even on a 32-bit target.
++        # Numba array allocation requires dimensions in the target intp type.
+         output_core_shapes = [
+-            cgutils.unpack_tuple(builder, shape)
+-            for shape in cgutils.unpack_tuple(builder, output_core_shapes)
++            [
++                ctx.cast(builder, dim, dim_type, types.intp)
++                for dim, dim_type in zip(
++                    cgutils.unpack_tuple(builder, shape), shape_type, strict=True
++                )
++            ]
++            for shape, shape_type in zip(
++                cgutils.unpack_tuple(builder, output_core_shapes),
++                sig.args[8],
++                strict=True,
++            )
+         ]
+-        size = None if size_is_none else cgutils.unpack_tuple(builder, size)
++        size = (
++            None
++            if size_is_none
++            else [
++                ctx.cast(builder, dim, dim_type, types.intp)
++                for dim, dim_type in zip(
++                    cgutils.unpack_tuple(builder, size), sig.args[9], strict=True
++                )
++            ]
++        )
+ 
+         # First n_core_inputs outer inputs are source arrays
+         inputs = [

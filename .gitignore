@@ -4,3 +4,8 @@ __pycache__/
 /adapter/target/
 /browser-artifact/
 /node_modules/
+/runtime-profile/.env/
+/runtime-profile/_output/
+/runtime-profile/runtime/
+/runtime-profile/wheels/
+/runtime-profile/content/

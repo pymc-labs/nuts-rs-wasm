@@ -15,6 +15,8 @@ thread_local! {
     static RESULT: RefCell<Vec<u8>> = RefCell::new(Vec::new());
     static CONFIG: RefCell<Vec<Variable>> = RefCell::new(Vec::new());
     static CALLBACK: Cell<usize> = const { Cell::new(0) };
+    static EXPAND_CALLBACK: Cell<usize> = const { Cell::new(0) };
+    static TRACE_CALLBACK: Cell<usize> = const { Cell::new(0) };
     static EVALUATIONS: Cell<u64> = const { Cell::new(0) };
 }
 #[cfg(target_arch = "wasm32")]
@@ -128,7 +130,20 @@ impl CpuLogpFunc for Density {
         }
         #[cfg(not(target_arch = "wasm32"))]
         {
-            out.copy_from_slice(x);
+            let pointer = EXPAND_CALLBACK.with(|p| p.get());
+            if pointer != 0 {
+                let f: extern "C" fn(*const f64, *mut f64) -> i32 =
+                    unsafe { std::mem::transmute(pointer) };
+                if f(x.as_ptr(), out.as_mut_ptr()) != 0 {
+                    return Err(CpuMathError::ExpandError("Model expansion failed".into()));
+                }
+            } else if out.len() == x.len() {
+                out.copy_from_slice(x);
+            } else {
+                return Err(CpuMathError::ExpandError(
+                    "Set an expansion callback".into(),
+                ));
+            }
         }
         Ok(Expanded(out))
     }
@@ -146,6 +161,14 @@ fn ipc(batch: &RecordBatch) -> Result<Vec<u8>, String> {
 #[no_mangle]
 pub extern "C" fn set_callback(p: usize) {
     CALLBACK.with(|v| v.set(p));
+}
+#[no_mangle]
+pub extern "C" fn set_expand_callback(p: usize) {
+    EXPAND_CALLBACK.with(|v| v.set(p));
+}
+#[no_mangle]
+pub extern "C" fn set_trace_callback(p: usize) {
+    TRACE_CALLBACK.with(|v| v.set(p));
 }
 #[no_mangle]
 pub extern "C" fn alloc_f64(n: usize) -> *mut f64 {
@@ -294,7 +317,13 @@ pub unsafe extern "C" fn run(
                 #[cfg(target_arch = "wasm32")]
                 report_trace(c, kind as u32, bytes.as_ptr(), bytes.len());
                 #[cfg(not(target_arch = "wasm32"))]
-                let _ = (kind, bytes);
+                TRACE_CALLBACK.with(|p| {
+                    if p.get() != 0 {
+                        let f: extern "C" fn(u32, u32, *const u8, usize) =
+                            std::mem::transmute(p.get());
+                        f(c, kind as u32, bytes.as_ptr(), bytes.len());
+                    }
+                });
             }
             samples.push(chain);
             expanded_samples.push(expanded_chain);

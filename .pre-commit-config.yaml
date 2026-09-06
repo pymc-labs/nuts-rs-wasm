@@ -1,3 +1,4 @@
+exclude: ^runtime-profile/(third-party-licenses|patches)/
 ci:
   autofix_prs: false
 

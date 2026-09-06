@@ -38,6 +38,8 @@ jobs:
           python -m pip install 'pymc==6.2.0' 'pytensor==3.2.4' 'numba==0.66.0' pyarrow
           python test_compile.py
           python test_results.py
+          cargo +1.94.0 build --locked --release --manifest-path adapter/Cargo.toml
+          python test_native.py adapter/target/release/libnuts_browser_adapter.so
       - name: Assemble experimental static files
         run: |
           npm run build

@@ -1,0 +1,8 @@
+{
+  "package": "emscripten-abi-4.0.9-h267e887_9",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/noarch/emscripten-abi-4.0.9-h267e887_9.tar.bz2",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE.txt"
+  ]
+}

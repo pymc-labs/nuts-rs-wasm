@@ -1,0 +1,8 @@
+{
+  "package": "h5py-3.15.1-np23py313h1a64791_2",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/h5py-3.15.1-np23py313h1a64791_2.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "licenses/license.txt"
+  ]
+}

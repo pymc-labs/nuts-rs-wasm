@@ -1,0 +1,91 @@
+{
+  "platform": "browser-wasm",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "runs": [
+    {
+      "seed": 42,
+      "seconds": 25.329799999964237,
+      "compile_seconds": 16.938200000000002,
+      "sampling_seconds": 8.391599999964237,
+      "divergences": 0,
+      "max_rhat": 1.0232514006155957,
+      "min_ess": 183.42246617814075,
+      "min_tail_ess": 165.21748008343897,
+      "min_ess_per_second": 21.857865744187336,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39954629125364954,
+        0.19443068110039
+      ],
+      "logp_evaluations": 80911
+    },
+    {
+      "seed": 142,
+      "seconds": 19.314300000011922,
+      "compile_seconds": 11.3155,
+      "sampling_seconds": 7.998800000011921,
+      "divergences": 0,
+      "max_rhat": 1.0104939098373953,
+      "min_ess": 184.71204047293068,
+      "min_tail_ess": 192.26958500667416,
+      "min_ess_per_second": 23.092468929421337,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39709068099279865,
+        0.1932943269832056
+      ],
+      "logp_evaluations": 76717
+    },
+    {
+      "seed": 242,
+      "seconds": 19.125799999999998,
+      "compile_seconds": 11.207799999999999,
+      "sampling_seconds": 7.918,
+      "divergences": 0,
+      "max_rhat": 1.0172576429164641,
+      "min_ess": 110.29479394884373,
+      "min_tail_ess": 117.63493399673914,
+      "min_ess_per_second": 13.929627929886806,
+      "seasonality": true,
+      "adstock_mean": [
+        0.396894710558264,
+        0.192428343474847
+      ],
+      "logp_evaluations": 74182
+    },
+    {
+      "seed": 342,
+      "seconds": 19.357200000035768,
+      "compile_seconds": 11.743300000000005,
+      "sampling_seconds": 7.613900000035763,
+      "divergences": 0,
+      "max_rhat": 1.0156160563087213,
+      "min_ess": 186.0708922041911,
+      "min_tail_ess": 187.4011647652088,
+      "min_ess_per_second": 24.43831573875637,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3966218008481869,
+        0.19144899821973838
+      ],
+      "logp_evaluations": 72039
+    },
+    {
+      "seed": 442,
+      "seconds": 20.147200000035774,
+      "compile_seconds": 11.73230000000001,
+      "sampling_seconds": 8.414900000035763,
+      "divergences": 0,
+      "max_rhat": 1.02075628081295,
+      "min_ess": 125.10507761338422,
+      "min_tail_ess": 215.9702046890792,
+      "min_ess_per_second": 14.867090234328694,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39590235899268966,
+        0.1918594354849994
+      ],
+      "logp_evaluations": 77367
+    }
+  ]
+}

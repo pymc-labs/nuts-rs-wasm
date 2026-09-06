@@ -1,0 +1,53 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PyMC MMM · WASM notebook</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;color:#112b40;margin:24px;max-width:960px}button{font:inherit;background:#1257d5;color:white;border:0;border-radius:6px;padding:12px 20px;cursor:pointer}button:disabled{opacity:.6}button+button{background:#526576}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f5fc;padding:16px;font-size:13px}a{color:#1257d5;margin-right:16px}progress{width:100%}svg{width:100%;height:auto}label{display:block;margin:15px 0}h1{font-size:25px}#error{color:#a52222}</style>
+<h1>Marketing mix · sampled in this browser</h1><p>The notebook and demo use the same nuts-rs-wasm adapter, transformations and Arrow storage.</p>
+<label><input id="seasonality" type="checkbox" checked> Include yearly seasonality</label>
+<button id="start">Start sampling</button> <button id="stop" disabled>Stop</button>
+<p id="status" role="status">Ready. The runtime loads only when you start.</p><progress id="progress" max="2500" value="0"></progress>
+<p id="count">0 retained draws</p><svg id="plot" viewBox="0 0 800 200" role="img" aria-label="Live adstock posterior histogram"></svg>
+<p id="error" role="alert"></p><pre id="summary" hidden></pre><p id="downloads"></p>
+<details><summary>Python model used for this run</summary><pre id="source"></pre></details>
+<script type="module">
+import {createSampler} from './nuts/client.mjs';
+const el=id=>document.getElementById(id);
+const read=async path=>{const r=await fetch(path);if(!r.ok)throw Error(`Cannot load ${path}`);return r.text();};
+let config={};
+try{if(location.hash.length>1)config=JSON.parse(decodeURIComponent(location.hash.slice(1)));}catch(e){el('error').textContent='Invalid notebook configuration';el('start').disabled=true;}
+const source=config.source??await read('./mmm/model.py');
+el('source').textContent=source;
+el('seasonality').checked=config.seasonality!==false;
+let sampler,urls=[],cancelled=false;
+el('stop').onclick=()=>{cancelled=true;sampler?.close();};
+el('start').onclick=async()=>{
+  el('start').disabled=true;el('stop').disabled=false;el('seasonality').disabled=true;cancelled=false;
+  el('error').textContent='';el('summary').hidden=true;el('downloads').replaceChildren();urls.forEach(URL.revokeObjectURL);urls=[];
+  const values=[[],[]];let retained=0,buffer='';el('count').textContent='0 retained draws';el('plot').replaceChildren();
+  sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
+  const seasonality=el('seasonality').checked;
+  try{
+    const csv=await read('./mmm/mmm_example.csv'),diagnostics=await read('./mmm/diagnostics.py');
+    const options={chains:2,tune:750,draws:500,seed:42,...config.options};
+    el('progress').max=options.chains*(options.tune+options.draws);
+    const result=await sampler.sample(`SEASONALITY = ${seasonality?'True':'False'}\n`+source,{
+      ...options,files:{'/mmm_example.csv':csv},
+      varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution',...(seasonality?['gamma_fourier']:[])],
+      afterSample:diagnostics,
+      onPhase:phase=>el('status').textContent=phase,
+      onProgress:p=>el('progress').value=p.chain*(options.tune+options.draws)+p.index+1,
+      onSamples:b=>{
+        retained+=b.draws;el('count').textContent=`${retained} retained draws`;
+        let offset=0;for(const v of b.layout){if(v.name==='adstock_alpha')break;offset+=v.size;}
+        const width=b.layout.reduce((n,v)=>n+v.size,0);
+        for(let i=0;i<b.draws;i++)for(let c=0;c<2;c++)values[c].push(b.values[i*width+offset+c]);
+        const counts=values.map(v=>{const a=Array(40).fill(0);for(const x of v)a[Math.max(0,Math.min(39,Math.floor(x*40)))]++;return a;});
+        const max=Math.max(1,...counts.flat());
+        el('plot').innerHTML=counts.map((a,c)=>a.map((n,i)=>`<rect x="${i*20}" y="${180-160*n/max}" width="19" height="${160*n/max}" fill="${c?'#b52b6d':'#1257d5'}" opacity=".5"/>`).join('')).join('');
+      },
+      onOutput:text=>{buffer+=text;const lines=buffer.split('\n');buffer=lines.pop();for(const line of lines)if(line.startsWith('MMM_EVENT ')){const event=JSON.parse(line.slice(10));if(event.type==='diagnostics'){el('summary').textContent=JSON.stringify(event,null,2);el('summary').hidden=false;}}},
+    });
+    for(const {chain,group,bytes} of result.traces){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes]));urls.push(a.href);a.download=`chain-${chain+1}-${group}.arrow`;a.textContent=a.download;el('downloads').append(a);}
+    el('status').textContent='Complete · real posterior draws and Arrow traces';
+  }catch(e){el('status').textContent=cancelled?'Stopped':'Could not finish';if(!cancelled)el('error').textContent=String(e);}
+  finally{sampler?.close();el('start').disabled=false;el('stop').disabled=true;el('seasonality').disabled=false;}
+};
+</script>

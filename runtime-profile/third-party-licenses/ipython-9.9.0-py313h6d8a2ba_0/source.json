@@ -1,0 +1,8 @@
+{
+  "package": "ipython-9.9.0-py313h6d8a2ba_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/ipython-9.9.0-py313h6d8a2ba_0.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "package": "python-3.13.1-h_2efca29_11_cp313",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/python-3.13.1-h_2efca29_11_cp313.tar.bz2",
+  "license": "Python-2.0",
+  "license_files": [
+    "LICENSE"
+  ]
+}

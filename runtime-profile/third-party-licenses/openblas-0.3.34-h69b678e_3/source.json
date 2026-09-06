@@ -1,0 +1,8 @@
+{
+  "package": "openblas-0.3.34-h69b678e_3",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/openblas-0.3.34-h69b678e_3.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

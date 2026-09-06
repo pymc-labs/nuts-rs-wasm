@@ -1,0 +1,9 @@
+{
+  "package": "charset-normalizer-3.5.1-pyhd8ed1ab_0",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/charset-normalizer-3.5.1-pyhd8ed1ab_0.conda",
+  "license": "MIT",
+  "license_files": [
+    "data/NOTICE.md",
+    "LICENSE"
+  ]
+}

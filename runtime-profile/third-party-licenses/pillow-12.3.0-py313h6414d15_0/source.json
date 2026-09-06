@@ -1,0 +1,8 @@
+{
+  "package": "pillow-12.3.0-py313h6414d15_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/pillow-12.3.0-py313h6414d15_0.tar.bz2",
+  "license": "HPND",
+  "license_files": [
+    "LICENSE"
+  ]
+}

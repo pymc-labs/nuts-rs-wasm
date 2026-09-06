@@ -1,0 +1,37 @@
+# Based on empack 6.0.1 defaults; retain setuptools for PyTensor runtime exceptions.
+packages:
+  setuptools:
+    exclude_patterns: []
+  zlib:
+    exclude_patterns:
+    - pattern: '**/so'
+  widgetsnbextension:
+    exclude_patterns:
+    - pattern: '**'
+  numpy:
+    exclude_patterns:
+    - pattern: '**/*.pyx'
+    - pattern: '**/*.pyc'
+    - pattern: '**/*.typed'
+    - pattern: '**/*.egg-info'
+default:
+  exclude_patterns:
+  - pattern: bin/**
+  - pattern: '**/bin/**'
+  - pattern: tests/**
+  - pattern: '**/tests/**'
+  - pattern: '**/*.ini'
+  - pattern: '**/*.exe'
+  - pattern: '**/*.c'
+  - pattern: '**/*.pxd'
+  - pattern: '**/*.pyx'
+  - pattern: '**/*.pyc'
+  - pattern: '**/*.typed'
+  - pattern: '**/*.egg-info'
+  - pattern: '**/site-packages/pip/_vendor/**'
+  - pattern: '**/idlelib/**'
+  - pattern: '**/ensurepip/**'
+  - pattern: Scripts/*
+  - pattern: share/jupyter/nbextensions/**
+  - pattern: share/jupyter/labextensions/**
+  - pattern: etc/jupyter/nbconfig/**

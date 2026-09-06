@@ -1,0 +1,8 @@
+{
+  "package": "contourpy-1.3.3-py313hffb8c6e_4",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/contourpy-1.3.3-py313hffb8c6e_4.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

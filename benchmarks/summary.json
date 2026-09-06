@@ -1,0 +1,75 @@
+{
+  "native": {
+    "sampling_seconds": {
+      "median": 0.807327666960191,
+      "min": 0.7750369579880498,
+      "max": 0.8464516249950975
+    },
+    "seconds": {
+      "median": 9.804477499972563,
+      "min": 9.53322904201923,
+      "max": 13.189840207982343
+    },
+    "min_ess_per_second": {
+      "median": 194.51275183489406,
+      "min": 154.59941624206922,
+      "max": 214.0870969494342
+    },
+    "min_ess": {
+      "median": 150.75457147200075,
+      "min": 124.8123860281172,
+      "max": 181.21437110333156
+    },
+    "max_rhat": {
+      "median": 1.0162942769822048,
+      "min": 1.0103773409273185,
+      "max": 1.025151693144146
+    }
+  },
+  "browser": {
+    "sampling_seconds": {
+      "median": 7.998800000011921,
+      "min": 7.613900000035763,
+      "max": 8.414900000035763
+    },
+    "seconds": {
+      "median": 19.357200000035768,
+      "min": 19.125799999999998,
+      "max": 25.329799999964237
+    },
+    "min_ess_per_second": {
+      "median": 21.857865744187336,
+      "min": 13.929627929886806,
+      "max": 24.43831573875637
+    },
+    "min_ess": {
+      "median": 183.42246617814075,
+      "min": 110.29479394884373,
+      "max": 186.0708922041911
+    },
+    "max_rhat": {
+      "median": 1.0172576429164641,
+      "min": 1.0104939098373953,
+      "max": 1.0232514006155957
+    }
+  },
+  "method": {
+    "repetitions": 5,
+    "seeds": [
+      42,
+      142,
+      242,
+      342,
+      442
+    ],
+    "chains": 2,
+    "tune": 750,
+    "draws": 500,
+    "target_accept": 0.9,
+    "seasonality": true,
+    "hardware": "MacBook Air M3",
+    "imports": "preloaded",
+    "compilation": "new model and callbacks every fit",
+    "precision": "Different floating-point/adaptation trajectories; not a matched-precision comparison."
+  }
+}

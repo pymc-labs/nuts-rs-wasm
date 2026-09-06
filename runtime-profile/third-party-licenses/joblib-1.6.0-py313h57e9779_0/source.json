@@ -1,0 +1,8 @@
+{
+  "package": "joblib-1.6.0-py313h57e9779_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/joblib-1.6.0-py313h57e9779_0.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE.txt"
+  ]
+}

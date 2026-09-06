@@ -1,0 +1,8 @@
+{
+  "package": "nlohmann_json-abi-3.12.0-h0f90c79_2",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/nlohmann_json-abi-3.12.0-h0f90c79_2.conda",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE.MIT"
+  ]
+}

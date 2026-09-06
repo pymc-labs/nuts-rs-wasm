@@ -1,0 +1,8 @@
+{
+  "package": "scikit-learn-1.9.0-np23py313hb9816c2_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/scikit-learn-1.9.0-np23py313hb9816c2_0.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "COPYING"
+  ]
+}

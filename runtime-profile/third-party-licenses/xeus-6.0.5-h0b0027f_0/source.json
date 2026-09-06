@@ -1,0 +1,8 @@
+{
+  "package": "xeus-6.0.5-h0b0027f_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/xeus-6.0.5-h0b0027f_0.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

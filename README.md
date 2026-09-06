@@ -4,8 +4,13 @@ NUTS sampling in WebAssembly, using **nuts-rs** with a **PyMC/Numba integration*
 Model evaluation, parameter expansion and sampling execute locally in a browser
 worker. No sampling server and no Nutpie Python extension are required.
 
-Experimental: currently tested with a compatible Xeus/Emscripten runtime, not
-stock Pyodide. You must supply that runtime; it is not bundled in this project.
+Experimental: tested with the Xeus/Emscripten environment distributed in our
+[v0.1.0-alpha.1 prerelease](https://github.com/pymc-labs/nuts-rs-wasm/releases/tag/v0.1.0-alpha.1).
+Download the small **adapter** archive and separate **runtime** archive, extract
+both into one directory and serve it with `python -m http.server 8000`.
+Open http://localhost:8000/ to sample the MMM or download its editable notebook.
+No local PyMC installation is required. See [runtime-profile](runtime-profile/)
+for exact versions, patches, dependency notices and the build recipe.
 
 ## Sample a PyMC model from JavaScript
 
@@ -131,7 +136,8 @@ omit it when the runtime already exports memory. Unknown loaders are rejected.
 The bootstrap must live in the runtime directory because Xeus resolves its
 unpacker WASM relative to the worker URL.
 
-No PyPI/npm release is published automatically; package.json is private.
+The versioned GitHub prerelease distributes static archives and SHA-256 checksums.
+There is no PyPI/npm release; package.json remains private.
 
 The runtime must supply `comlink.worker.js` and
 `xeus/<environment>/xpython/kernel.json`, with the package bundle in Xeus' usual
@@ -167,3 +173,20 @@ A manual MMM check of the Arrow/high-level API also completed all 1,000 retained
 draws, live plots, prediction and four Arrow downloads: 8.5 s sampling and 29.9 s
 model preparation plus sampling, zero divergences, max R-hat 1.023, min ESS 183.
 Browser cancellation during initialization was checked separately.
+
+## One example, three entry points
+
+`examples/mmm/model.py` and `diagnostics.py` are shared by the web app, browser
+notebook and native/browser benchmarks. `scripts/sync_demo.py SITE_PATH` copies
+those sources and the current adapter artifact into an existing demo checkout.
+The notebook prepares editable Python source and displays `notebook.html`; its
+Numba model compilation, Rust sampling, transformations and Arrow storage run in
+the same browser worker as the app, with no Python-NUTS fallback.
+
+The app offers yearly seasonality on/off and compares actual posterior carryover
+estimates. The five-fit [benchmark](benchmarks/) includes both native expansion
+and Arrow output: median 0.807 s native / 7.999 s WASM for warmup and sampling;
+9.80 / 19.36 s including model preparation and compilation with imports preloaded.
+Median minimum bulk ESS/s was 194.5 / 21.9. These short runs do not establish
+matched posterior precision; raw records, diagnostics and plotting code are
+included. `test_native.py` covers constrained expansion and Arrow read-back.

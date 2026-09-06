@@ -1,0 +1,8 @@
+{
+  "package": "python_abi-3.13-9_cp313",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/python_abi-3.13-9_cp313.conda",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

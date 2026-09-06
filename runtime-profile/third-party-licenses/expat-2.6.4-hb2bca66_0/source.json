@@ -1,0 +1,8 @@
+{
+  "package": "expat-2.6.4-hb2bca66_0",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/expat-2.6.4-hb2bca66_0.tar.bz2",
+  "license": "MIT",
+  "license_files": [
+    "COPYING"
+  ]
+}

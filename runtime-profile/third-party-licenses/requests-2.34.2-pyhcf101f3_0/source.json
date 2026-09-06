@@ -1,0 +1,8 @@
+{
+  "package": "requests-2.34.2-pyhcf101f3_0",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/requests-2.34.2-pyhcf101f3_0.conda",
+  "license": "Apache-2.0",
+  "license_files": [
+    "LICENSE"
+  ]
+}

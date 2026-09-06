@@ -1,0 +1,8 @@
+{
+  "package": "llvmlite-0.48.0-py313hb6bfdb0_8",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/llvmlite-0.48.0-py313hb6bfdb0_8.tar.bz2",
+  "license": "BSD-2-Clause",
+  "license_files": [
+    "LICENSE"
+  ]
+}

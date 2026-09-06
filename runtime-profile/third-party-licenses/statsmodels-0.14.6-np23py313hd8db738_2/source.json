@@ -1,0 +1,8 @@
+{
+  "package": "statsmodels-0.14.6-np23py313hd8db738_2",
+  "url": "https://repo.prefix.dev/emscripten-forge-4x/emscripten-wasm32/statsmodels-0.14.6-np23py313hd8db738_2.tar.bz2",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE.txt"
+  ]
+}

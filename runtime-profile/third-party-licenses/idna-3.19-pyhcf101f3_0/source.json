@@ -1,0 +1,8 @@
+{
+  "package": "idna-3.19-pyhcf101f3_0",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/idna-3.19-pyhcf101f3_0.conda",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE.md"
+  ]
+}

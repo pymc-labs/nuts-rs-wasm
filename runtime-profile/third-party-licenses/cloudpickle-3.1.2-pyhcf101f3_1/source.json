@@ -1,0 +1,8 @@
+{
+  "package": "cloudpickle-3.1.2-pyhcf101f3_1",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/cloudpickle-3.1.2-pyhcf101f3_1.conda",
+  "license": "BSD-3-Clause",
+  "license_files": [
+    "LICENSE.txt"
+  ]
+}

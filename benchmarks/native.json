@@ -1,0 +1,90 @@
+{
+  "platform": "native-arm64",
+  "runs": [
+    {
+      "seed": 42,
+      "seconds": 13.189840207982343,
+      "compile_seconds": 12.382512541022152,
+      "sampling_seconds": 0.807327666960191,
+      "divergences": 0,
+      "max_rhat": 1.0175751939916629,
+      "min_ess": 124.8123860281172,
+      "min_tail_ess": 69.4979488442965,
+      "min_ess_per_second": 154.59941624206922,
+      "seasonality": true,
+      "adstock_mean": [
+        0.398937760267278,
+        0.1927188892364604
+      ],
+      "logp_evaluations": 80041
+    },
+    {
+      "seed": 142,
+      "seconds": 9.53322904201923,
+      "compile_seconds": 8.755305667000357,
+      "sampling_seconds": 0.7779233750188723,
+      "divergences": 0,
+      "max_rhat": 1.025151693144146,
+      "min_ess": 155.90515989003683,
+      "min_tail_ess": 163.24208200431283,
+      "min_ess_per_second": 200.41197487638752,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39782021356092717,
+        0.19255890435154693
+      ],
+      "logp_evaluations": 79785
+    },
+    {
+      "seed": 242,
+      "seconds": 9.900477416987997,
+      "compile_seconds": 9.054025791992899,
+      "sampling_seconds": 0.8464516249950975,
+      "divergences": 0,
+      "max_rhat": 1.0103773409273185,
+      "min_ess": 181.21437110333156,
+      "min_tail_ess": 157.2216030959896,
+      "min_ess_per_second": 214.0870969494342,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3972376316163664,
+        0.1892317264424239
+      ],
+      "logp_evaluations": 80756
+    },
+    {
+      "seed": 342,
+      "seconds": 9.569096584047657,
+      "compile_seconds": 8.757378375041299,
+      "sampling_seconds": 0.8117182090063579,
+      "divergences": 0,
+      "max_rhat": 1.0114035593085025,
+      "min_ess": 148.51122723135433,
+      "min_tail_ess": 137.8215008580596,
+      "min_ess_per_second": 182.95909292604162,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39821406429573014,
+        0.1912376085345464
+      ],
+      "logp_evaluations": 82541
+    },
+    {
+      "seed": 442,
+      "seconds": 9.804477499972563,
+      "compile_seconds": 9.029440541984513,
+      "sampling_seconds": 0.7750369579880498,
+      "divergences": 0,
+      "max_rhat": 1.0162942769822048,
+      "min_ess": 150.75457147200075,
+      "min_tail_ess": 169.80698100238095,
+      "min_ess_per_second": 194.51275183489406,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3982257073213878,
+        0.1925133144896924
+      ],
+      "logp_evaluations": 78627
+    }
+  ]
+}

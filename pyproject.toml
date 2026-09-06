@@ -1,3 +1,9 @@
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+
+[tool.ruff.lint.per-file-ignores]
+# Executed in the sampling runtime with model/idata and timing globals supplied.
+"examples/mmm/model.py" = ["F401"]
+"examples/mmm/diagnostics.py" = ["F821"]
+"examples/mmm/predict.py" = ["F821"]

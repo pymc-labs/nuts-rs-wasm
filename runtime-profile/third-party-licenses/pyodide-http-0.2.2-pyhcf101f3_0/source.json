@@ -1,0 +1,8 @@
+{
+  "package": "pyodide-http-0.2.2-pyhcf101f3_0",
+  "url": "https://repo.prefix.dev/conda-forge/noarch/pyodide-http-0.2.2-pyhcf101f3_0.conda",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ]
+}

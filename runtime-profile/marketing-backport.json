@@ -1,0 +1,8 @@
+{
+  "base_wheel": "https://files.pythonhosted.org/packages/2a/85/9388327d43b552fd985f1a869decb9e1280c6cd94f4d6ca2c5ce10d56cf8/pymc_marketing-1.1.0-py3-none-any.whl",
+  "base_sha256": "3761a0e790c7c69b3548697bb2eb242be9284eb49fe219aff9685e6c75445a1d",
+  "upstream_version": "1.1.0",
+  "local_patch": "patches/marketing-deterministics-progressbar.patch",
+  "version": "1.1.0+wasm.1",
+  "output_sha256": "3c8b80d936fff77aad5141e58780fa9e1a7cead0144ef7cb6d807ef477c0aac6"
+}
