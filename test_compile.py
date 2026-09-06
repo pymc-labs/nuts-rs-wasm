@@ -58,6 +58,24 @@ class CompilerTests(unittest.TestCase):
         self.assertEqual(len(compiled.initial), 4)
         self.assertEqual(len(compiled.expanded), 8)
 
+    def test_initial_position_is_immutable_and_separate_from_callback_scratch(self):
+        with pm.Model() as model:
+            pm.Normal("x", initval=0.7)
+        compiled = compile_browser_model(model)
+        original = compiled.initial.copy()
+        config = compiled.config()
+        self.assertNotEqual(config["x_pointer"], compiled.initial.ctypes.data)
+        compiled.scratch[:] = 12.0
+        pointer = ctypes.POINTER(ctypes.c_double)
+        compiled.callback.ctypes(
+            compiled.scratch.ctypes.data_as(pointer),
+            compiled.gradient.ctypes.data_as(pointer),
+        )
+        np.testing.assert_array_equal(compiled.initial, original)
+        self.assertEqual(compiled.config()["initial"], original.tolist())
+        with self.assertRaises(ValueError):
+            compiled.initial[0] = 100.0
+
     def test_discrete_rejected(self):
         with pm.Model() as model:
             pm.Bernoulli("x", 0.5)

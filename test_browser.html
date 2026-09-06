@@ -1,0 +1,36 @@
+<!doctype html><meta charset="utf-8"><title>Browser sampler integration checks</title>
+<button id="run">Run integration checks</button><pre id="status">Ready</pre>
+<script type="module">
+import {createSampler} from './browser-artifact/client.mjs';
+const status=document.querySelector('#status');
+const assert=(ok,message)=>{if(!ok)throw Error(message);};
+document.querySelector('#run').onclick=async()=>{
+ const sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
+ try {
+  status.textContent='Loading runtime';
+  await Promise.all([sampler.initialize(),sampler.initialize()]);
+  const source=`import pymc as pm\nwith pm.Model(coords={'item':['a','b']}) as model:\n    x=pm.Normal('x',dims='item',initval=[0.1,0.2])\n    squared=pm.Deterministic('squared',x*x,dims='item')`;
+  status.textContent='Compiling model';
+  const handle=await sampler.prepare(source);
+  const opts={chains:2,tune:25,draws:12,seed:42,afterSample:"assert idata.posterior.x.shape == (2,12,2)\nassert list(idata.posterior.item.values)==['a','b']\nassert _nuts_compile_seconds == 0\nassert (idata.posterior.squared.values == idata.posterior.x.values**2).all()"};
+  let count=0;
+  status.textContent='Sampling compatibility results';
+  const first=await sampler.sample(handle,{...opts,onSamples:b=>{count+=b.draws;structuredClone(b.values,{transfer:[b.values.buffer]});}});
+  assert(count===24,'Stream draw count');assert(first.traces.length===4,'Arrow traces');
+  assert(first.compile_seconds===0,'Reused compile time');
+  status.textContent='Sampling binary results';
+  const second=await sampler.sample(handle,{...opts,resultFormat:'binary',retainUnconstrained:false});
+  assert(second.expanded_samples instanceof Float64Array,'Binary values');
+  assert(!('samples' in second),'Unconstrained retention disabled');
+  assert(JSON.stringify(first.expanded_samples.flat(2))===JSON.stringify(Array.from(second.expanded_samples)),'Fixed seed reuse');
+  assert(second.traces.every(t=>t.bytes.byteLength>0),'Final Arrow owns its data');
+  status.textContent='Checking handle lifetime';
+  await sampler.release(handle);
+  let rejected=false;try{await sampler.sample(handle,opts);}catch{rejected=true;}assert(rejected,'Released handle rejected');
+  const other=await sampler.prepare(source);
+  sampler.cancel();rejected=false;try{await sampler.sample(other,opts);}catch{rejected=true;}assert(rejected,'Cancelled handle rejected');
+  status.textContent='PASS: concurrent initialization, reuse, fixed seeds, binary results, xarray coordinates/deterministics, callback ownership, Arrow, release and cancellation';
+ }catch(e){status.textContent=String(e.stack||e);}
+ finally{sampler.close();}
+};
+</script>

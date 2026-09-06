@@ -1,0 +1,104 @@
+{
+  "platform": "browser-wasm",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "memory_scope": "Main page heap snapshot only, excludes worker; not peak memory",
+  "measurement_scope": "One fit per configuration, in listed order; first fit includes lazy initialization. Both formats use worker-local binary Python ingestion. No controlled speedup claim.",
+  "runs": [
+    {
+      "size": "small",
+      "draws": 100,
+      "width": 8,
+      "resultFormat": "compatibility",
+      "retainUnconstrained": true,
+      "wall_ms": 81.89999997615814,
+      "sampling_ms": 18.900000035762787,
+      "python_preparation_ms": 17.099999964237213,
+      "arrow_bytes": 80160,
+      "main_page_heap_bytes": 7426370
+    },
+    {
+      "size": "small",
+      "draws": 100,
+      "width": 8,
+      "resultFormat": "compatibility",
+      "retainUnconstrained": false,
+      "wall_ms": 30.30000001192093,
+      "sampling_ms": 8.100000023841858,
+      "python_preparation_ms": 12.199999988079071,
+      "arrow_bytes": 80160,
+      "main_page_heap_bytes": 7426370
+    },
+    {
+      "size": "small",
+      "draws": 100,
+      "width": 8,
+      "resultFormat": "binary",
+      "retainUnconstrained": true,
+      "wall_ms": 26.099999964237213,
+      "sampling_ms": 7.699999988079071,
+      "python_preparation_ms": 11.299999952316284,
+      "arrow_bytes": 80160,
+      "main_page_heap_bytes": 7463938
+    },
+    {
+      "size": "small",
+      "draws": 100,
+      "width": 8,
+      "resultFormat": "binary",
+      "retainUnconstrained": false,
+      "wall_ms": 27.5,
+      "sampling_ms": 5.600000023841858,
+      "python_preparation_ms": 15,
+      "arrow_bytes": 80160,
+      "main_page_heap_bytes": 7463938
+    },
+    {
+      "size": "large",
+      "draws": 2000,
+      "width": 128,
+      "resultFormat": "compatibility",
+      "retainUnconstrained": true,
+      "wall_ms": 170.70000004768372,
+      "sampling_ms": 78.30000001192093,
+      "python_preparation_ms": 30.30000001192093,
+      "arrow_bytes": 5137312,
+      "main_page_heap_bytes": 26617946
+    },
+    {
+      "size": "large",
+      "draws": 2000,
+      "width": 128,
+      "resultFormat": "compatibility",
+      "retainUnconstrained": false,
+      "wall_ms": 149.80000001192093,
+      "sampling_ms": 95,
+      "python_preparation_ms": 15.699999988079071,
+      "arrow_bytes": 5137312,
+      "main_page_heap_bytes": 40527469
+    },
+    {
+      "size": "large",
+      "draws": 2000,
+      "width": 128,
+      "resultFormat": "binary",
+      "retainUnconstrained": true,
+      "wall_ms": 92.5,
+      "sampling_ms": 67,
+      "python_preparation_ms": 15.899999976158142,
+      "arrow_bytes": 5137312,
+      "main_page_heap_bytes": 46247945
+    },
+    {
+      "size": "large",
+      "draws": 2000,
+      "width": 128,
+      "resultFormat": "binary",
+      "retainUnconstrained": false,
+      "wall_ms": 87.80000001192093,
+      "sampling_ms": 64.5,
+      "python_preparation_ms": 13.5,
+      "arrow_bytes": 5137312,
+      "main_page_heap_bytes": 60320873
+    }
+  ]
+}

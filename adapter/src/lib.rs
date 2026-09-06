@@ -12,6 +12,11 @@ use std::{
 };
 
 thread_local! {
+    static BINARY: Cell<bool> = const { Cell::new(false) };
+    static RETAIN_UNCONSTRAINED: Cell<bool> = const { Cell::new(true) };
+    static SAMPLES: RefCell<Vec<f64>> = RefCell::new(Vec::new());
+    static EXPANDED: RefCell<Vec<f64>> = RefCell::new(Vec::new());
+    static STATS: RefCell<Vec<f64>> = RefCell::new(Vec::new());
     static RESULT: RefCell<Vec<u8>> = RefCell::new(Vec::new());
     static CONFIG: RefCell<Vec<Variable>> = RefCell::new(Vec::new());
     static CALLBACK: Cell<usize> = const { Cell::new(0) };
@@ -205,6 +210,36 @@ pub extern "C" fn result_ptr() -> *const u8 {
 pub extern "C" fn result_len() -> usize {
     RESULT.with(|r| r.borrow().len())
 }
+/// Configure result storage. Defaults preserve the original native JSON API.
+#[no_mangle]
+pub extern "C" fn set_result_options(binary: u32, retain_unconstrained: u32) {
+    BINARY.with(|v| v.set(binary != 0));
+    RETAIN_UNCONSTRAINED.with(|v| v.set(retain_unconstrained != 0));
+}
+#[no_mangle]
+pub extern "C" fn samples_ptr() -> *const f64 {
+    SAMPLES.with(|v| v.borrow().as_ptr())
+}
+#[no_mangle]
+pub extern "C" fn samples_len() -> usize {
+    SAMPLES.with(|v| v.borrow().len())
+}
+#[no_mangle]
+pub extern "C" fn expanded_ptr() -> *const f64 {
+    EXPANDED.with(|v| v.borrow().as_ptr())
+}
+#[no_mangle]
+pub extern "C" fn expanded_len() -> usize {
+    EXPANDED.with(|v| v.borrow().len())
+}
+#[no_mangle]
+pub extern "C" fn stats_ptr() -> *const f64 {
+    STATS.with(|v| v.borrow().as_ptr())
+}
+#[no_mangle]
+pub extern "C" fn stats_len() -> usize {
+    STATS.with(|v| v.borrow().len())
+}
 /// # Safety
 /// start addresses n live doubles; native callers must first set a valid callback.
 #[no_mangle]
@@ -217,6 +252,11 @@ pub unsafe extern "C" fn run(
     start: *const f64,
     target_accept: f64,
 ) -> i32 {
+    SAMPLES.with(|v| v.borrow_mut().clear());
+    EXPANDED.with(|v| v.borrow_mut().clear());
+    STATS.with(|v| v.borrow_mut().clear());
+    let binary = BINARY.with(Cell::get);
+    let retain_unconstrained = RETAIN_UNCONSTRAINED.with(Cell::get);
     let initial = std::slice::from_raw_parts(start, n);
     let work = || -> Result<serde_json::Value, String> {
         if n == 0
@@ -272,6 +312,21 @@ pub unsafe extern "C" fn run(
             let mut stats = Vec::new();
             let mut batch = Vec::new();
             for i in 0..tune + draws {
+                // The pinned GlobalStrategy marks draws 0..num_tune as tuning.
+                // draw() still advances adaptation, RNG and the last statistics state.
+                // This adapter's expansion is deterministic and never uses the RNG.
+                // Deferring expanded_draw() also leaves the transformation statistics
+                // cursor untouched, so the first retained row records its current ID.
+                if i < tune {
+                    let (_, p) = sampler.draw().map_err(|e| e.to_string())?;
+                    debug_assert!(p.tuning);
+                    leapfrogs += p.num_steps;
+                    #[cfg(target_arch = "wasm32")]
+                    if i % 10 == 0 {
+                        report_progress(c, i, u32::from(p.tuning));
+                    }
+                    continue;
+                }
                 let (x, mut expanded, mut full_stats, p) =
                     sampler.expanded_draw().map_err(|e| e.to_string())?;
                 leapfrogs += p.num_steps;
@@ -290,15 +345,33 @@ pub unsafe extern "C" fn run(
                     .map_err(|e| e.to_string())?;
                 if !p.tuning {
                     divergences += u32::from(p.diverging);
-                    chain.push(x.to_vec());
-                    expanded_chain.push(flat.clone());
+                    if binary {
+                        if retain_unconstrained {
+                            SAMPLES.with(|v| v.borrow_mut().extend_from_slice(&x));
+                        }
+                        EXPANDED.with(|v| v.borrow_mut().extend_from_slice(&flat));
+                        STATS.with(|v| {
+                            v.borrow_mut().extend_from_slice(&[
+                                f64::from(p.diverging),
+                                p.num_steps as f64,
+                                p.step_size,
+                            ])
+                        });
+                    } else {
+                        if retain_unconstrained {
+                            chain.push(x.to_vec());
+                        }
+                        expanded_chain.push(flat.clone());
+                    }
                     batch.extend(flat);
-                    stats.push(serde_json::json!({"diverging":p.diverging,"n_steps":p.num_steps,"step_size":p.step_size}));
+                    if !binary {
+                        stats.push(serde_json::json!({"diverging":p.diverging,"n_steps":p.num_steps,"step_size":p.step_size}));
+                    }
                     if batch.len() / ne >= 10 || i + 1 == tune + draws {
                         #[cfg(target_arch = "wasm32")]
                         report_samples(
                             c,
-                            (chain.len() - batch.len() / ne) as u32,
+                            (i - tune + 1) - (batch.len() / ne) as u32,
                             batch.as_ptr(),
                             (batch.len() / ne) as u32,
                             ne,
@@ -329,9 +402,18 @@ pub unsafe extern "C" fn run(
             expanded_samples.push(expanded_chain);
             all_stats.push(stats);
         }
-        Ok(
-            serde_json::json!({"samples":samples,"expanded_samples":expanded_samples,"stats":all_stats,"divergences":divergences,"leapfrog_steps":leapfrogs,"logp_evaluations":EVALUATIONS.with(|v|v.get())}),
-        )
+        let mut result = serde_json::json!({"divergences":divergences,"leapfrog_steps":leapfrogs,"logp_evaluations":EVALUATIONS.with(|v|v.get())});
+        if binary {
+            result["shape"] = serde_json::json!([chains, draws, ne]);
+            result["unconstrained_width"] = serde_json::json!(n);
+        } else {
+            if retain_unconstrained {
+                result["samples"] = serde_json::json!(samples);
+            }
+            result["expanded_samples"] = serde_json::json!(expanded_samples);
+            result["stats"] = serde_json::json!(all_stats);
+        }
+        Ok(result)
     };
     let (value, status) = match work() {
         Ok(v) => (v, 0),

@@ -1,0 +1,782 @@
+{
+  "generated_at": "2026-09-06T10:01:52.845Z",
+  "runtime": {
+    "node": "v25.8.1",
+    "v8": "14.1.146.11-node.21",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "description": "Cheap actual WASM Gaussian and expansion callbacks; bridge calls only, no compilation/sampler/serialization; one full warmup batch per mode; rotating measurement order.",
+  "rows": [
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 31.089624999999998
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 26.773042000000004
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 20.936374999999998
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 27.17066699999998
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 19.55449999999999
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 30.660042000000004
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 19.486541999999986
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 29.818084
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 24.669415999999956
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 30.841583000000014
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 26.373041999999998
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 20.049374999999998
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 25.871917000000053
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 19.79445800000002
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 30.007374999999968
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 20.04004100000003
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 30.36470799999995
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 26.4993750000001
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 31.36399999999992
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 25.484250000000088
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 19.87566700000002
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 30.311000000000035
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 25.953125
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 0,
+      "iterations": 200000,
+      "milliseconds": 18.008290999999986
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 25.61445900000001
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 18.659915999999953
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 1,
+      "iterations": 200000,
+      "milliseconds": 30.43262500000003
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 19.78374999999994
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 29.64929200000006
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 2,
+      "iterations": 200000,
+      "milliseconds": 26.62662499999999
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 31.98625000000004
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 120.56720800000005
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 3,
+      "iterations": 200000,
+      "milliseconds": 36.36704200000008
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 27.060333000000128
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 20.463792000000012
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 4,
+      "iterations": 200000,
+      "milliseconds": 30.732291999999916
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 18.928416999999854
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 30.01804100000004
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 5,
+      "iterations": 200000,
+      "milliseconds": 25.611249999999927
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 33.00679200000013
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 27.630499999999984
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 6,
+      "iterations": 200000,
+      "milliseconds": 19.29275000000007
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 24.213917000000038
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 22.35266700000011
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 22.553292000000056
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 23.151834000000008
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 22.52204199999983
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 23.9353329999999
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 23.431833000000097
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 22.698667000000114
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 23.031541999999945
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 22.750500000000102
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 22.69654199999991
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 22.412708000000066
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 23.700375000000122
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 22.64195799999993
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 22.43445799999995
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 22.877250000000004
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 24.00583299999994
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 21.49420800000007
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 21.58312499999988
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 22.551249999999982
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 22.780708000000004
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 11.981709000000137
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 11.414582999999993
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 0,
+      "iterations": 20000,
+      "milliseconds": 11.644208000000162
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 12.182416999999987
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 14.898167000000058
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 1,
+      "iterations": 20000,
+      "milliseconds": 12.093250000000126
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 10.938916999999947
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 11.854375000000346
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 2,
+      "iterations": 20000,
+      "milliseconds": 11.502166999999645
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 11.361124999999902
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 11.231624999999894
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 3,
+      "iterations": 20000,
+      "milliseconds": 11.134458999999879
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 11.257290999999896
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 10.741040999999768
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 4,
+      "iterations": 20000,
+      "milliseconds": 11.37808300000006
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 11.047875000000204
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 11.579957999999806
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 5,
+      "iterations": 20000,
+      "milliseconds": 11.445416999999907
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 11.756458000000293
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 11.731041000000005
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "repetition": 6,
+      "iterations": 20000,
+      "milliseconds": 11.61095800000021
+    }
+  ],
+  "summary": [
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "median_ns_per_call": 153.30021000000002,
+      "min_ns_per_call": 149.09042,
+      "max_ns_per_call": 156.8199999999996
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "median_ns_per_call": 131.86521,
+      "min_ns_per_call": 123.34707999999978,
+      "max_ns_per_call": 135.8533349999999
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "median_ns_per_call": 99.3783350000001,
+      "min_ns_per_call": 97.43270999999993,
+      "max_ns_per_call": 104.681875
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "median_ns_per_call": 152.16312500000015,
+      "min_ns_per_call": 148.2464600000003,
+      "max_ns_per_call": 165.03396000000066
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "median_ns_per_call": 133.13312499999995,
+      "min_ns_per_call": 128.05624999999964,
+      "max_ns_per_call": 602.8360400000003
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "median_ns_per_call": 96.46375000000036,
+      "min_ns_per_call": 90.04145499999993,
+      "max_ns_per_call": 181.83521000000042
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "median_ns_per_call": 1137.525000000005,
+      "min_ns_per_call": 1079.156249999994,
+      "max_ns_per_call": 1210.6958500000019
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "median_ns_per_call": 1134.8270999999954,
+      "min_ns_per_call": 1074.7104000000036,
+      "max_ns_per_call": 1185.018750000006
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "median_ns_per_call": 1132.0978999999966,
+      "min_ns_per_call": 1120.6354000000033,
+      "max_ns_per_call": 1171.5916500000048
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "median_ns_per_call": 587.8229000000147,
+      "min_ns_per_call": 568.0562499999951,
+      "max_ns_per_call": 604.6625000000063
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "median_ns_per_call": 572.2708499999953,
+      "min_ns_per_call": 561.5812499999947,
+      "max_ns_per_call": 609.1208499999993
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "median_ns_per_call": 556.722949999994,
+      "min_ns_per_call": 537.0520499999884,
+      "max_ns_per_call": 744.9083500000029
+    }
+  ]
+}
