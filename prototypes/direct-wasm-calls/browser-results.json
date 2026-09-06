@@ -1,0 +1,123 @@
+{
+  "kind": "actual_numba_direct_callback_browser_probe",
+  "recorded_date": "2026-09-06",
+  "browser": "Chrome 152",
+  "platform": "macOS",
+  "correctness": {
+    "gaussian": [
+      "density, gradient and expansion match both bridge modes at three positions",
+      "analytic Gaussian gradient, HalfNormal transform and deterministic"
+    ],
+    "mmm": [
+      "density, gradient and expansion match both bridge modes at three positions"
+    ]
+  },
+  "fallback_checks": [
+    "sampling after direct callback probe",
+    "positive transform",
+    "deterministic",
+    "Arrow groups",
+    "streaming",
+    "same-seed reused handle",
+    "released handle after worker teardown"
+  ],
+  "gaussian": {
+    "iterations": 20000,
+    "runs": 5,
+    "runtime_memory_capacity_bytes": 291110912,
+    "results": {
+      "js_uncached_with_copies": {
+        "milliseconds": [
+          21.599999964237213,
+          17.80000001192093,
+          18.099999964237213,
+          17.900000035762787,
+          18.599999964237213
+        ],
+        "median_ms": 18.099999964237213
+      },
+      "js_cached_with_copies": {
+        "milliseconds": [
+          16.69999998807907,
+          16.100000023841858,
+          16,
+          16.19999998807907,
+          16.69999998807907
+        ],
+        "median_ms": 16.19999998807907
+      },
+      "js_shared_buffers": {
+        "milliseconds": [
+          16,
+          15.899999976158142,
+          15.399999976158142,
+          14.700000047683716,
+          14.399999976158142
+        ],
+        "median_ms": 15.399999976158142
+      },
+      "wasm_direct_shared_buffers": {
+        "milliseconds": [
+          14,
+          14.600000023841858,
+          15.5,
+          14.299999952316284,
+          14.300000011920929
+        ],
+        "median_ms": 14.300000011920929
+      }
+    }
+  },
+  "mmm": {
+    "iterations": 1000,
+    "runs": 5,
+    "runtime_memory_capacity_bytes": 503185408,
+    "results": {
+      "js_uncached_with_copies": {
+        "milliseconds": [
+          116.69999998807907,
+          113.19999998807907,
+          111.5,
+          110.89999997615814,
+          109.80000001192093
+        ],
+        "median_ms": 111.5
+      },
+      "js_cached_with_copies": {
+        "milliseconds": [
+          110,
+          110.19999998807907,
+          113.60000002384186,
+          107.80000001192093,
+          107.29999995231628
+        ],
+        "median_ms": 110
+      },
+      "js_shared_buffers": {
+        "milliseconds": [
+          113.90000003576279,
+          110.5,
+          108.79999995231628,
+          105.5,
+          107.90000003576279
+        ],
+        "median_ms": 108.79999995231628
+      },
+      "wasm_direct_shared_buffers": {
+        "milliseconds": [
+          105.59999996423721,
+          111.5,
+          110.39999997615814,
+          107.10000002384186,
+          106.29999995231628
+        ],
+        "median_ms": 107.10000002384186
+      }
+    }
+  },
+  "limitations": [
+    "Stateless WASM caller, not direct Rust NUTS",
+    "Fixed mode order; five runs; no full direct-backend MMM sampling",
+    "Memory capacity includes runtime and retained prior state, not peak live allocations or per-mode memory cost"
+  ]
+}

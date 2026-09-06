@@ -238,3 +238,10 @@ and Arrow output: median 0.807 s native / 7.999 s WASM for warmup and sampling;
 Median minimum bulk ESS/s was 194.5 / 21.9. These short runs do not establish
 matched posterior precision; raw records, diagnostics and plotting code are
 included. `test_native.py` covers constrained expansion and Arrow read-back.
+
+
+The [direct-WASM feasibility report](docs/direct-wasm-calls.md) and bounded
+callback prototype investigate an Emscripten side module with coordinated memory.
+A full Rust/Numba direct backend has not been validated; the current bridge
+remains the sampling path. See [benchmarks](benchmarks/) for separate compilation,
+warmup, result-transfer and callback-cache measurements.
