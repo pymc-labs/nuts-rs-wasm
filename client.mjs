@@ -122,7 +122,7 @@ export class BrowserSampler {
   sample(sourceOrHandle, options = {}) {
     return this.withOperation(options, async check => {
       const {chains = 2, tune = 750, draws = 500, seed = 42, targetAccept = .9,
-        onPhase, afterSample = '', resultFormat = 'compatibility', retainUnconstrained = true, bridgeCache = 'views'} = options;
+        onPhase, afterSample = '', resultFormat = 'compatibility', retainUnconstrained = true, bridgeCache = 'callbacks'} = options;
       if (!['compatibility', 'binary'].includes(resultFormat)) throw Error('resultFormat must be compatibility or binary');
       const reused = typeof sourceOrHandle !== 'string';
       if (reused && ('files' in options || 'varNames' in options))

@@ -7,7 +7,7 @@ import {createModelBridge} from './bridge-memory.mjs';
 export async function sample({bytes, runtime, model, chains = 2, tune = 750,
     draws = 500, seed = 42, targetAccept = 0.9, onProgress = () => {},
     onSamples = () => {}, onTrace, resultFormat = 'compatibility',
-    retainUnconstrained = true, bridgeCache = 'views'}) {
+    retainUnconstrained = true, bridgeCache = 'callbacks'}) {
   if (!['compatibility', 'binary'].includes(resultFormat)) throw Error('Invalid resultFormat');
   if (typeof retainUnconstrained !== 'boolean') throw Error('Invalid retainUnconstrained');
   for (const [name, value] of Object.entries({chains, tune, draws, seed})) {

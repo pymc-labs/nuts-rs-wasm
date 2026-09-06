@@ -1,5 +1,5 @@
 /** Per-fit bridge between independent sampler and model WASM memories. */
-export function createModelBridge(runtime, model, samplerMemory, cache = 'views') {
+export function createModelBridge(runtime, model, samplerMemory, cache = 'callbacks') {
   if (!['none', 'callbacks', 'views'].includes(cache)) throw Error('Invalid bridge cache mode');
   // Each fit owns its callbacks. Never retain a function from a previous model.
   const logp = cache === 'none' ? null : runtime.wasmTable.get(model.callback_pointer);
