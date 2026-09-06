@@ -93,6 +93,7 @@ test('explicit handles compile once across seeds and draws and keep distinct cal
   const rt=runtime(t), {client,calls,codes}=rt;client.fetch=async()=>'';
   const first=await client.prepare('model=None');
   const a=await client.sample(first,{seed:1,draws:2});const b=await client.sample(first,{seed:2,draws:7,resultFormat:'binary',retainUnconstrained:false});
+  assert.equal(calls.find(x=>x.kind==='sample').options.jitter,1);
   assert.equal(rt.compiles,1);assert.equal(a.compile_seconds,0);assert.equal(b.model_compile_seconds,3);
   assert.equal(b.python_result_path,undefined);assert.ok(codes.some(c=>c.includes('load_worker_result("/tmp/result.json")')));
   const second=await client.compile('model=None',{files:{'data.csv':'new'},varNames:['b']});
@@ -173,4 +174,27 @@ test('an old operation signal cannot cancel a replacement while its fetch unwind
   const handle=await client.compile('model=None');controller.abort();
   assert.equal(workers[1].terminated,undefined);await client.sample(handle);
   oldFetch.resolve('');await rejected;
+});
+
+test('mutable data updates reuse callbacks and serialize with fits', async t => {
+  const rt=runtime(t), {client,calls,codes}=rt; client.fetch=async()=>'';
+  const handle=await client.prepare('model=None',{mutableData:['observed']});
+  await client.updateData(handle,{observed:[1,2,3]});
+  assert.ok(codes.some(code=>code.includes('.update_data(json.loads(')));
+  await client.sample(handle,{maxDepth:5,jitter:.2,initRetries:7});
+  const call=calls.find(x=>x.kind==='sample');
+  assert.equal(call.options.maxDepth,5);assert.equal(call.options.jitter,.2);assert.equal(call.options.initRetries,7);
+  assert.equal(rt.compiles,1);
+  client.busy=true;
+  await assert.rejects(client.updateData(handle,{observed:[4,5,6]}),/already active/);
+  client.busy=false; await client.release(handle);
+  await assert.rejects(client.updateData(handle,{observed:[4,5,6]}),/invalid or expired/);
+});
+test('stream mode skips Python result construction and rejects afterSample', async t => {
+  const {client,codes,calls}=runtime(t);client.fetch=async()=>'';
+  const handle=await client.prepare('model=None');const before=codes.length;
+  await client.sample(handle,{resultFormat:'stream'});
+  assert.equal(codes.length,before);
+  assert.equal(calls.find(x=>x.kind==='sample').options.resultFormat,'stream');
+  await assert.rejects(client.sample(handle,{resultFormat:'stream',afterSample:'print(idata)'}),/afterSample/);
 });

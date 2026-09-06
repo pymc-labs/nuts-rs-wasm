@@ -1,0 +1,70 @@
+{
+  "kind": "cheap_actual_wasm_callback_microbenchmark",
+  "node": "v25.8.1",
+  "platform": "darwin",
+  "arch": "arm64",
+  "iterations": 1000000,
+  "runs": 7,
+  "direct_module_bytes": 190,
+  "fixture_module_bytes": 171,
+  "fixture_linear_memory_bytes": 262144,
+  "note": "Not Numba or full Rust sampler. Fixed 2D fixture. JS shared versus WASM direct isolates boundary; copy modes also differ in view work.",
+  "checks": [
+    "density",
+    "gradient",
+    "expansion",
+    "both memories grow",
+    "repeated calls",
+    "explicit invalidation"
+  ],
+  "results": {
+    "js_uncached_with_copies": {
+      "milliseconds": [
+        188.018542,
+        162.47537499999999,
+        160.91325,
+        187.21875,
+        180.09691699999996,
+        194.44433300000003,
+        218.1539170000001
+      ],
+      "median_ms": 187.21875
+    },
+    "js_cached_with_copies": {
+      "milliseconds": [
+        63.920459000000164,
+        63.02649999999994,
+        67.911292,
+        77.59008399999993,
+        71.94770799999992,
+        77.451458,
+        67.79433300000005
+      ],
+      "median_ms": 67.911292
+    },
+    "js_shared_buffers": {
+      "milliseconds": [
+        13.591416999999865,
+        13.056874999999991,
+        15.408249999999953,
+        13.666707999999971,
+        14.975540999999794,
+        13.842707999999902,
+        14.56008399999996
+      ],
+      "median_ms": 13.842707999999902
+    },
+    "wasm_direct_shared_buffers": {
+      "milliseconds": [
+        5.165457999999944,
+        4.592167000000018,
+        4.5942499999998745,
+        5.0149589999998625,
+        4.593249999999898,
+        4.845125000000053,
+        4.657333999999992
+      ],
+      "median_ms": 4.657333999999992
+    }
+  }
+}

@@ -4,7 +4,7 @@ use nuts_rs::{
     HasDims, ItemType, LogpError, Settings, StatsDims, Storable, StorageConfig, TraceStorage,
     Value,
 };
-use rand::{rngs::StdRng, SeedableRng};
+use rand::{rngs::StdRng, RngExt, SeedableRng};
 use serde::Deserialize;
 use std::{
     cell::{Cell, RefCell},
@@ -12,6 +12,11 @@ use std::{
 };
 
 thread_local! {
+    static MAX_DEPTH: Cell<u64> = const { Cell::new(10) };
+    // Match nutpie's PyMC initialization default: U(-1, +1).
+    static JITTER: Cell<f64> = const { Cell::new(1.) };
+    static INIT_RETRIES: Cell<u32> = const { Cell::new(10) };
+    static STREAM_ONLY: Cell<bool> = const { Cell::new(false) };
     static BINARY: Cell<bool> = const { Cell::new(false) };
     static RETAIN_UNCONSTRAINED: Cell<bool> = const { Cell::new(true) };
     static SAMPLES: RefCell<Vec<f64>> = RefCell::new(Vec::new());
@@ -216,6 +221,24 @@ pub extern "C" fn set_result_options(binary: u32, retain_unconstrained: u32) {
     BINARY.with(|v| v.set(binary != 0));
     RETAIN_UNCONSTRAINED.with(|v| v.set(retain_unconstrained != 0));
 }
+/// Per-fit options; native and browser callers default to unit initial jitter.
+#[no_mangle]
+pub extern "C" fn set_sampler_options(
+    max_depth: u32,
+    jitter: f64,
+    init_retries: u32,
+    stream_only: u32,
+) -> i32 {
+    if max_depth == 0 || max_depth > 20 || !jitter.is_finite() || jitter < 0. || init_retries > 1000
+    {
+        return 1;
+    }
+    MAX_DEPTH.with(|v| v.set(max_depth.into()));
+    JITTER.with(|v| v.set(jitter));
+    INIT_RETRIES.with(|v| v.set(init_retries));
+    STREAM_ONLY.with(|v| v.set(stream_only != 0));
+    0
+}
 #[no_mangle]
 pub extern "C" fn samples_ptr() -> *const f64 {
     SAMPLES.with(|v| v.borrow().as_ptr())
@@ -257,6 +280,7 @@ pub unsafe extern "C" fn run(
     STATS.with(|v| v.borrow_mut().clear());
     let binary = BINARY.with(Cell::get);
     let retain_unconstrained = RETAIN_UNCONSTRAINED.with(Cell::get);
+    let stream_only = STREAM_ONLY.with(Cell::get);
     let initial = std::slice::from_raw_parts(start, n);
     let work = || -> Result<serde_json::Value, String> {
         if n == 0
@@ -289,11 +313,12 @@ pub unsafe extern "C" fn run(
         let mut divergences = 0;
         let mut leapfrogs = 0u64;
         EVALUATIONS.with(|v| v.set(0));
+        let mut initial_positions = Vec::new();
         for c in 0..chains {
             let mut settings = DiagNutsSettings::default();
             settings.num_tune = tune.into();
             settings.num_draws = draws.into();
-            settings.maxdepth = 10;
+            settings.maxdepth = MAX_DEPTH.with(Cell::get);
             settings.adapt_options.step_size_settings.target_accept = target_accept;
             let math = CpuMath::new(density.clone());
             let mut config = ArrowConfig::default();
@@ -301,12 +326,48 @@ pub unsafe extern "C" fn run(
             let storage = config
                 .new_trace(&settings, &math)
                 .map_err(|e| e.to_string())?;
-            let mut trace = storage
-                .initialize_trace_for_chain(c.into())
-                .map_err(|e| e.to_string())?;
+            let mut trace = if stream_only {
+                None
+            } else {
+                Some(
+                    storage
+                        .initialize_trace_for_chain(c.into())
+                        .map_err(|e| e.to_string())?,
+                )
+            };
             let mut rng = StdRng::seed_from_u64(seed as u64 + c as u64);
             let mut sampler = settings.new_chain(c.into(), math, &mut rng);
-            sampler.set_position(initial).map_err(|e| e.to_string())?;
+            let jitter = JITTER.with(Cell::get);
+            // Separate RNG preserves sampling randomness when jitter is disabled.
+            let mut init_rng = StdRng::seed_from_u64((seed as u64 + c as u64) ^ 0x9e3779b97f4a7c15);
+            let mut position = initial.to_vec();
+            let mut last_error = None;
+            for _ in 0..=INIT_RETRIES.with(Cell::get) {
+                for (value, base) in position.iter_mut().zip(initial) {
+                    *value = *base
+                        + if jitter == 0. {
+                            0.
+                        } else {
+                            init_rng.random_range(-1.0..1.0) * jitter
+                        };
+                }
+                match sampler.set_position(&position) {
+                    Ok(()) => {
+                        last_error = None;
+                        break;
+                    }
+                    Err(error) => {
+                        last_error = Some(error.to_string());
+                        if jitter == 0. {
+                            break;
+                        }
+                    }
+                }
+            }
+            if let Some(error) = last_error {
+                return Err(format!("Chain {c} initialization failed: {error}"));
+            }
+            initial_positions.push(position);
             let mut chain = Vec::new();
             let mut expanded_chain = Vec::new();
             let mut stats = Vec::new();
@@ -340,12 +401,14 @@ pub unsafe extern "C" fn run(
                         _ => vec![],
                     })
                     .collect();
-                trace
-                    .record_sample(&settings, full_stats.get_all(&dims), values, &p)
-                    .map_err(|e| e.to_string())?;
+                if let Some(trace) = trace.as_mut() {
+                    trace
+                        .record_sample(&settings, full_stats.get_all(&dims), values, &p)
+                        .map_err(|e| e.to_string())?;
+                }
                 if !p.tuning {
                     divergences += u32::from(p.diverging);
-                    if binary {
+                    if binary && !stream_only {
                         if retain_unconstrained {
                             SAMPLES.with(|v| v.borrow_mut().extend_from_slice(&x));
                         }
@@ -357,14 +420,14 @@ pub unsafe extern "C" fn run(
                                 p.step_size,
                             ])
                         });
-                    } else {
+                    } else if !stream_only {
                         if retain_unconstrained {
                             chain.push(x.to_vec());
                         }
                         expanded_chain.push(flat.clone());
                     }
                     batch.extend(flat);
-                    if !binary {
+                    if !binary && !stream_only {
                         stats.push(serde_json::json!({"diverging":p.diverging,"n_steps":p.num_steps,"step_size":p.step_size}));
                     }
                     if batch.len() / ne >= 10 || i + 1 == tune + draws {
@@ -384,26 +447,29 @@ pub unsafe extern "C" fn run(
                     report_progress(c, i, u32::from(p.tuning));
                 }
             }
-            let trace = trace.finalize().map_err(|e| e.to_string())?;
-            for (kind, batch) in [&trace.posterior, &trace.sample_stats].iter().enumerate() {
-                let bytes = ipc(batch)?;
-                #[cfg(target_arch = "wasm32")]
-                report_trace(c, kind as u32, bytes.as_ptr(), bytes.len());
-                #[cfg(not(target_arch = "wasm32"))]
-                TRACE_CALLBACK.with(|p| {
-                    if p.get() != 0 {
-                        let f: extern "C" fn(u32, u32, *const u8, usize) =
-                            std::mem::transmute(p.get());
-                        f(c, kind as u32, bytes.as_ptr(), bytes.len());
-                    }
-                });
+            if let Some(trace) = trace {
+                let trace = trace.finalize().map_err(|e| e.to_string())?;
+                for (kind, batch) in [&trace.posterior, &trace.sample_stats].iter().enumerate() {
+                    let bytes = ipc(batch)?;
+                    #[cfg(target_arch = "wasm32")]
+                    report_trace(c, kind as u32, bytes.as_ptr(), bytes.len());
+                    #[cfg(not(target_arch = "wasm32"))]
+                    TRACE_CALLBACK.with(|p| {
+                        if p.get() != 0 {
+                            let f: extern "C" fn(u32, u32, *const u8, usize) =
+                                std::mem::transmute(p.get());
+                            f(c, kind as u32, bytes.as_ptr(), bytes.len());
+                        }
+                    });
+                }
             }
             samples.push(chain);
             expanded_samples.push(expanded_chain);
             all_stats.push(stats);
         }
         let mut result = serde_json::json!({"divergences":divergences,"leapfrog_steps":leapfrogs,"logp_evaluations":EVALUATIONS.with(|v|v.get())});
-        if binary {
+        result["initial_positions"] = serde_json::json!(initial_positions);
+        if binary || stream_only {
             result["shape"] = serde_json::json!([chains, draws, ne]);
             result["unconstrained_width"] = serde_json::json!(n);
         } else {

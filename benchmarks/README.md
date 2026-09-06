@@ -135,7 +135,8 @@ To compare actual MMM end-to-end behavior, select **Reused model** and
 **Compare all three bridges** in the MMM page. One compiled handle serves all
 15 measured fits. A short untimed fit warms each bridge; mode order reverses
 on alternating seeds. Compilation and Python postprocessing remain separately
-reported.
+reported. The [direct-call investigation](../docs/direct-wasm-calls.md) has a
+separate bounded prototype; it is not a direct MMM backend.
 
 
 `bridge-cache-browser-summary.json` records seven browser repetitions. Width-2

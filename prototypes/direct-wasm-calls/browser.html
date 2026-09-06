@@ -1,0 +1,55 @@
+<!doctype html><meta charset="utf-8"><title>Actual Numba direct WASM probe</title>
+<button id="run">Run direct callback checks</button><pre id="status">Ready</pre>
+<script type="module">
+import {createSampler} from '/nuts/client.mjs';
+const status=document.querySelector('#status');
+const assert=(ok,message)=>{if(!ok)throw Error(message);};
+const probe=async(sampler,config,options)=>{
+  const worker=sampler.worker;let listener,timer;
+  try {return await new Promise((resolve,reject)=>{
+    listener=({data})=>{
+      if(data.nutsDirectProbe==='result')resolve(data.result);
+      if(data.nutsDirectProbe==='error')reject(Error(data.message));
+    };
+    worker.addEventListener('message',listener);
+    timer=setTimeout(()=>reject(Error('Direct callback probe timed out')),120000);
+    sampler.remote.callGlobalReceiver('nutsDirectProbe','check',config,options).catch(reject);
+  });}finally{clearTimeout(timer);worker.removeEventListener('message',listener);}
+};
+document.querySelector('#run').onclick=async()=>{
+  const sampler=createSampler({runtimeUrl:new URL('/direct-runtime/',location.href).href,environment:'pymc-marketing-wasm'});
+  try {
+    status.textContent='Compiling Gaussian, positive transform and deterministic';
+    const handle=await sampler.prepare(`import pymc as pm\nwith pm.Model() as model:\n    x=pm.Normal('x',initval=.25)\n    scale=pm.HalfNormal('scale',initval=1.5)\n    pm.Deterministic('derived',x+scale*scale)`,{varNames:['x','scale','derived']});
+    // Test-only access to configuration; no production sampler changes required.
+    const config=sampler.models.get(handle).config;
+    status.textContent='Comparing native Numba callbacks through direct WASM and both bridges';
+    const result=await probe(sampler,config,{});
+    status.textContent='Verifying ordinary sampling, transformations, Arrow and streaming after probe';
+    let streamed=0;
+    const first=await sampler.sample(handle,{chains:1,tune:20,draws:8,seed:123,resultFormat:'binary',
+      onSamples:b=>{streamed+=b.draws;},
+      afterSample:"import numpy as np\nassert np.allclose(idata.posterior.derived, idata.posterior.x+idata.posterior.scale**2)"});
+    assert(streamed===8,'streamed draw count');assert(first.traces.length===2,'Arrow groups');
+    const second=await sampler.sample(handle,{chains:1,tune:20,draws:8,seed:123,resultFormat:'binary'});
+    assert(JSON.stringify([...first.expanded_samples])===JSON.stringify([...second.expanded_samples]),'same seed reuse');
+    result.fallback_checks=['sampling after direct callback probe','positive transform','deterministic','Arrow groups','streaming','same-seed reused handle'];
+    await sampler.release(handle);
+    status.textContent='Compiling real MMM for callback comparisons';
+    const get=async path=>{const response=await fetch(path);if(!response.ok)throw Error(path);return response.text();};
+    const [source,csv]=await Promise.all(['/mmm/model.py','/mmm/mmm_example.csv'].map(get));
+    const mmm=await sampler.prepare('SEASONALITY = True\n'+source,{
+      files:{'/mmm_example.csv':csv},
+      varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution','gamma_fourier']
+    });
+    status.textContent='Comparing real MMM density, gradient, expansion and callback timings';
+    const mmmResult=await probe(sampler,sampler.models.get(mmm).config,{analytic:false,iterations:1000});
+    await sampler.release(mmm);sampler.close();
+    let rejected=false;try{await sampler.sample(handle);}catch{rejected=true;}assert(rejected,'worker teardown invalidates handle');
+    result.fallback_checks.push('released handle after worker teardown');
+    window.directProbeResults={userAgent:navigator.userAgent,gaussian:result,mmm:mmmResult};
+    status.textContent='PASS\n'+JSON.stringify(window.directProbeResults,null,2);
+  }catch(error){status.textContent=String(error.stack||error);}
+  finally{sampler.close();}
+};
+</script>
