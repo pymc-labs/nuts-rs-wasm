@@ -3,3 +3,4 @@ __pycache__/
 .venv/
 /adapter/target/
 /browser-artifact/
+/node_modules/

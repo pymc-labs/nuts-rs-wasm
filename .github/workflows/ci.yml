@@ -19,8 +19,12 @@ jobs:
           rustup target add --toolchain 1.94.0 wasm32-unknown-unknown
           cargo +1.94.0 fmt --manifest-path adapter/Cargo.toml --check
           cargo +1.94.0 build --locked --release --target wasm32-unknown-unknown --manifest-path adapter/Cargo.toml
-      - name: Test sampler and memory bridge
-        run: node test_bridge.mjs
+      - name: Test sampler, streaming, cancellation and Arrow output
+        run: |
+          npm ci --ignore-scripts
+          npm test
+          mkdir -p /tmp/arrow-test
+          ARROW_TEST_DIR=/tmp/arrow-test node test_bridge.mjs
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: '3.13'
@@ -29,13 +33,12 @@ jobs:
           PYTENSOR_FLAGS: cxx=,blas__ldflags=,numba__cache=False
           OPENBLAS_NUM_THREADS: '1'
         run: |
-          python -m pip install 'pymc==6.2.0' 'pytensor==3.2.4' 'numba==0.66.0'
+          python -m pip install 'pymc==6.2.0' 'pytensor==3.2.4' 'numba==0.66.0' pyarrow
           python test_compile.py
+          python test_results.py
       - name: Assemble experimental static files
         run: |
-          mkdir -p browser-artifact
-          cp adapter/target/wasm32-unknown-unknown/release/nuts_browser_adapter.wasm browser-artifact/
-          cp bridge.mjs compile_model.py README.md LICENSE browser-artifact/
+          npm run build
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nuts-rs-wasm

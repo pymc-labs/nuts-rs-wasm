@@ -1,12 +1,12 @@
 // Exercise the actual Rust WASM module and JS memory bridge with a Gaussian.
 // A real browser Numba function-table callback additionally needs a Xeus runtime.
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile, writeFile} from 'node:fs/promises';
 import {sample} from './bridge.mjs';
 const bytes = await readFile(process.argv[2] ??
   new URL('./adapter/target/wasm32-unknown-unknown/release/nuts_browser_adapter.wasm', import.meta.url));
 const memory = new WebAssembly.Memory({initial: 1});
-let calls = 0, progress = 0;
+let calls = 0, progress = 0, streamed = 0;
 const runtime = {wasmMemory: memory, wasmTable: {get(pointer) {
   assert.equal(pointer, 7);
   return (xp, gp) => {
@@ -20,7 +20,7 @@ const runtime = {wasmMemory: memory, wasmTable: {get(pointer) {
 }}};
 const model = {initial: [0.1, 0.2], x_pointer: 0, g_pointer: 16,
   callback_pointer: 7, layout: []};
-const options = {bytes, runtime, model, onProgress: () => progress++};
+const options = {bytes, runtime, model, onProgress: () => progress++, onSamples: b => {streamed += b.draws; assert.equal(b.values.length, b.draws * 2);}};
 const result = await sample(options);
 assert.equal(result.divergences, 0);
 assert.equal(result.samples.length, 2);
@@ -39,3 +39,10 @@ await assert.rejects(sample({...options, model: {...model, initial: [NaN, 0]}}),
 const badRuntime = {...runtime, wasmTable: {get: () => () => NaN}};
 await assert.rejects(sample({...options, runtime: badRuntime}));
 console.log('WASM Gaussian posterior, memory growth, progress and error handling passed');
+
+assert.equal(streamed, 1000);
+assert.equal(result.traces.length, 4);
+for (const trace of result.traces) {
+  assert.ok(trace.bytes.length > 1000);
+  if (process.env.ARROW_TEST_DIR) await writeFile(`${process.env.ARROW_TEST_DIR}/${trace.chain}-${trace.group}.arrow`, trace.bytes);
+}

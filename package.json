@@ -1,0 +1,9 @@
+{
+  "name": "@pymc-labs/nuts-rs-wasm",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "exports": {".": "./client.mjs", "./bridge": "./bridge.mjs"},
+  "scripts": {"build": "node build.mjs", "test": "node --test test_client.mjs"},
+  "dependencies": {"comlink": "4.4.2"}
+}

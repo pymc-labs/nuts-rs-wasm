@@ -1,156 +1,169 @@
 # nuts-rs-wasm
 
-Run NUTS sampling in WebAssembly using the sequential **nuts-rs** core, with
-an experimental **PyMC/Numba integration**. The Rust sampler runs in a browser
-worker and calls compiled model logp/gradients without Python per leapfrog step.
+NUTS sampling in WebAssembly, using **nuts-rs** with a **PyMC/Numba integration**.
+Model evaluation, parameter expansion and sampling execute locally in a browser
+worker. No sampling server and no Nutpie Python extension are required.
 
-This is a standalone project. It depends directly on `nuts-rs`, not the Nutpie
-Python package, and does not make `nutpie.sample` available in the browser.
-A compatible Xeus/Emscripten Python runtime must be supplied separately.
+Experimental: currently tested with a compatible Xeus/Emscripten runtime, not
+stock Pyodide. You must supply that runtime; it is not bundled in this project.
 
-Architecture: PyMC/PyTensor → Numba C callback ↔ JavaScript memory bridge ↔
-Rust `nuts-rs` compiled to WASM. The PyMC compiler is one model integration;
-the Rust callback interface itself is model-independent.
+## Sample a PyMC model from JavaScript
 
-## Build and test
+```javascript
+import {createSampler} from './browser-artifact/client.mjs';
 
-From this directory, with Rust 1.94.0 and Node available:
+const sampler = createSampler({
+  runtimeUrl: '/runtime/',
+  environment: 'pymc-marketing-wasm',
+});
+const controller = new AbortController();
+const result = await sampler.sample(`
+import pymc as pm
+with pm.Model() as model:
+    mu = pm.Normal("mu", initval=0.1)
+    sigma = pm.HalfNormal("sigma", initval=1.0)
+    pm.Normal("observed", mu, sigma, observed=[1.2, 0.8, 1.5])
+`, {
+  chains: 4, tune: 1000, draws: 1000, targetAccept: 0.9, seed: 42,
+  signal: controller.signal,
+  onPhase: console.log,
+  onProgress: ({chain, index, tuning}) => console.log(chain, index, tuning),
+  onSamples: ({chain, start, draws, values, layout}) => {
+    // A batch of expanded (constrained) values, including selected deterministics.
+    // values is a Float64Array of draws × sum(layout.map(v => v.size)).
+    console.log(chain, start, draws, values, layout);
+  },
+});
+// controller.abort() cancels a running call by terminating its worker.
+for (const {chain, group, bytes} of result.traces) {
+  // bytes is Arrow IPC stream data: one posterior + sample_stats file per chain.
+  const url = URL.createObjectURL(new Blob([bytes]));
+  // Attach to a download link, then revoke the URL when no longer needed.
+}
+sampler.close();
+```
+
+`model` must be defined by the Python code. The client loads the runtime, executes
+the code, compiles both callbacks, samples and constructs `idata` as an xarray
+DataTree in that Python runtime. Calls on one sampler are sequential; concurrent
+calls reject. Repeated calls can reuse the runtime. Cancellation rejects with
+`AbortError`; the next call starts a fresh worker.
+
+Options also include `varNames` (default: free RVs and deterministics), `files`
+(a mapping of in-runtime paths to text contents), `onOutput` (Python stdout), and
+`afterSample` (trusted Python code executed with `model`, `idata`, `_nuts_result`,
+and `_nuts_compile_seconds` available). Use `afterSample` for ArviZ diagnostics
+or PyMC posterior prediction, and emit application messages through `onOutput`.
+`sampler.execute(code)` can run Python after a completed sample while the runtime
+is still alive. Do not call it concurrently with sampling.
+
+See [examples/basic.html](examples/basic.html) for a minimal page with start,
+stop, progress and Arrow downloads. Serve the repository and configure a local
+compatible runtime under `/runtime/`. This is an integration example, not a
+standalone runtime installer.
+
+## Reuse of existing implementations
+
+- **PyMC** provides the backward transformations and deterministic expressions
+  through `model.unobserved_value_vars`. Like Nutpie's `_make_functions`, we
+  compile these expressions into a separate expansion callback. There are no
+  parameter-name heuristics or hand-written log/logit transforms.
+- **nuts-rs** provides `expanded_draw`, full sampler statistics and the actual
+  `ArrowConfig` / `ArrowTraceStorage` implementation. Arrow serialization uses
+  the standard Rust Arrow IPC writer. We do not implement a new trace format.
+- **Xeus + Comlink** provide the Python worker and its message transport.
+- **xarray/ArviZ** handle labeled results and downstream diagnostics.
+
+The adapter temporarily pins the minimal public-storage-API change in
+[nuts-rs #77](https://github.com/pymc-devs/nuts-rs/pull/77) at commit
+`b6f058e995c4ce2daa128e4790afab8bd4a71356`. It only exposes existing storage
+traits and StatsDims. Switch back to upstream once that API is released.
+
+## Results and streaming
+
+- `result.samples`: raw **unconstrained** coordinates, `[chain][draw][parameter]`.
+- `result.expanded_samples`: constrained variables and selected deterministics,
+  `[chain][draw][expanded parameter]`, described by `expanded_layout` and `coords`.
+- `result.traces`: actual Arrow IPC streams for each chain's posterior and full
+  sample statistics. Vector columns retain nuts-rs dimension/shape metadata.
+- `result.stats`: a small numeric compatibility view of divergence, step size
+  and leapfrog counts. The Arrow files contain the complete upstream statistics.
+- `sampling_seconds`: Rust call including warmup, expansion, Arrow recording,
+  live callbacks and serialization; excludes model compilation and later Python
+  postprocessing. `compile_seconds` covers model construction and compilation.
+
+Live batches contain the same expanded values submitted to Arrow storage. They
+are sent every 10 retained draws; warmup is reported as progress but not stored.
+The current implementation also retains numeric arrays for xarray compatibility,
+so memory use includes both Arrow and numeric views. Large models/traces need
+memory budgeting; Arrow streaming does not yet imply bounded-memory storage.
+
+## Build, tests and delivery
+
+Rust 1.94.0, Node and a package-compatible Python environment are required:
 
 ```sh
 rustup target add wasm32-unknown-unknown
-cargo build --locked --release --target wasm32-unknown-unknown --manifest-path adapter/Cargo.toml
-node test_bridge.mjs
+npm ci --ignore-scripts
+npm run build
+npm test
+mkdir -p /tmp/arrow-test
+ARROW_TEST_DIR=/tmp/arrow-test node test_bridge.mjs
+PYTENSOR_FLAGS=cxx=,blas__ldflags=,numba__cache=False OPENBLAS_NUM_THREADS=1 python test_compile.py
+python test_results.py
 ```
 
-The independent crate disables optional nuts-rs features; it does not include
-Nutpie's Python extension or its storage and parallel sampling dependencies. Its dependency commit
-is pinned to the tested nuts-rs 0.18.3 source. `Cargo.lock` is committed.
+Python tests use PyMC 6.2.0, PyTensor 3.2.4, Numba 0.66.0, xarray and PyArrow.
+Tests cover WASM Gaussian moments, live draw counts, Arrow IPC read-back,
+memory growth, cancellation, logp/gradient agreement, HalfNormal/Beta/simplex
+transforms, deterministics, dimensions and frozen data.
 
-In a Python environment with PyMC 6.2.0, PyTensor 3.2.4 and Numba 0.66.0:
+`browser-artifact/` contains the static WASM, JS and Python files. GitHub Actions
+builds the same downloadable artifact. Serve the directory alongside your
+runtime. Install its bootstrap next to the existing Xeus worker:
 
 ```sh
-PYTENSOR_FLAGS=cxx=,blas__ldflags=,numba__cache=False OPENBLAS_NUM_THREADS=1 python test_compile.py
+node configure-runtime.mjs /path/to/runtime pymc-marketing-wasm --export-memory
 ```
 
-The workflow builds a downloadable **nuts-rs-wasm** artifact
-containing the WASM module, Python compiler and JavaScript bridge. This is not
-a PyPI wheel or a complete Python runtime. No release is published automatically.
+The optional `--export-memory` applies the specific tested Xeus loader patch;
+omit it when the runtime already exports memory. Unknown loaders are rejected.
+The bootstrap must live in the runtime directory because Xeus resolves its
+unpacker WASM relative to the worker URL.
 
-## Embed in a browser application
+No PyPI/npm release is published automatically; package.json is private.
 
-Provide a working Xeus/Emscripten Python runtime with compatible PyMC, PyTensor
-and Numba packages. This has been tested with Python 3.13, Numba 0.66, llvmlite
-0.48, PyMC 6.2.0 and a locally patched PyTensor 3.2.4 WASM build. It has **not**
-been validated against stock Pyodide or arbitrary runtime/package versions.
-The caller must expose the runtime's actual `wasmMemory` and `wasmTable`.
-In the experiment the generated Xeus loader was locally patched to export
-its existing memory; a supported runtime export is needed for distribution.
+The runtime must supply `comlink.worker.js` and
+`xeus/<environment>/xpython/kernel.json`, with the package bundle in Xeus' usual
+layout. It must expose its actual `Module.wasmMemory` and `Module.wasmTable`.
+The tested runtime uses Python 3.13, Numba 0.66, llvmlite 0.48, PyMC 6.2.0,
+locally patched PyTensor 3.2.4 and PyMC-Marketing 1.1.0. The demo's generated Xeus
+loader currently has a local memory-export patch; this is not a stock-runtime
+guarantee. All runtime and artifact URLs must be fetchable by the application.
 
-Execute `compile_model.py` in that runtime (or import it directly from its
-filesystem), then compile a model:
+## Limits
 
-```python
-import pymc as pm
+Continuous, fully Numba-compilable graphs only. Shared data are frozen when
+compiled; changes require recompilation. Expanded values currently use float64.
+The Rust and Python modules have separate memories; the JS bridge copies inputs
+and outputs. No Python executes per logp or expansion evaluation.
 
-with pm.Model() as model:
-    x = pm.Normal("x", initval=0.1)
+Diagonal-mass NUTS, max depth 10, sequential chains, initial positions from PyMC,
+seeds `seed + chain`. No jitter retries, Stan/JAX/flows, multi-worker chains or
+cooperative cancellation. Terminating a worker cancels all of its Python state.
+Private PyTensor `vm.jit_fn` usage requires compatibility tests. Model code is
+trusted executable Python, not a sandbox for third-party submissions.
 
-compiled = compile_browser_model(model)
-config = compiled.config()  # send this JSON-serializable dict to the worker JS
-```
+The original MMM feasibility run (179 weeks, 15 dimensions, 2 × 750 warmup +
+500 retained draws) took 0.80 s native / 8.41 s browser before Arrow integration.
+These are historical single-run timings, not benchmarks of this expanded API.
+Max R-hat 1.018/1.023 and min bulk ESS 125/183 did not establish matched
+convergence or a precision-adjusted speedup over PyMC NUTS.
 
-Keep `compiled` alive for the entire sampling call. Once the Python execution
-has completed, use the same worker's JavaScript context:
+Originally explored in [nutpie #345](https://github.com/pymc-devs/nutpie/pull/345),
+then separated because the sampler dependency is nuts-rs directly.
 
-```javascript
-import {sample} from './bridge.mjs';
-
-const bytes = await (await fetch('./nuts_browser_adapter.wasm')).arrayBuffer();
-const result = await sample({
-  bytes,
-  runtime: Module, // the initialized Emscripten runtime
-  model: config,
-  chains: 2, tune: 750, draws: 500, seed: 42,
-  onProgress: progress => postMessage({progress}),
-});
-postMessage({result});
-```
-
-Sampling blocks this worker; use a dedicated worker so the page stays responsive.
-Do not start concurrent fits or invoke Python while this call runs. Terminating
-the worker cancels the entire runtime; cooperative cancellation is not implemented.
-The host is responsible for request sizes, downloads and posterior diagnostics.
-
-The files can be served together by a static host. All model computation stays
-in the browser. No server executes Python. Hosting these files does not install
-the requisite Python runtime: package/runtime compatibility still matters.
-
-## ABI and limitations
-
-The exported Rust `run(n, chains, tune, draws, seed, start)` consumes an aligned
-array of `n` doubles in **Rust memory**, returns a status, and exposes a JSON
-buffer via `result_ptr/result_len`. The JS wrapper allocates/frees the input;
-the output remains valid until the next call on that instance. Raw C exports
-are unsafe interfaces for trusted callers, not validated RPC endpoints.
-
-Rust imports `model_logp(x, gradient, n) -> f64`. The bridge copies positions
-into **Emscripten memory**, invokes the Numba callback through its function
-table, then copies gradients back. Views are reacquired after callback execution
-because Emscripten can grow memory. Python is not called per leapfrog step.
-The small JS copy and callback overhead remains; the two modules do not share
-an allocator or function table.
-
-- Continuous models with fully Numba-compilable graphs only. Shared data are
-  frozen at compilation; changes require recompilation.
-- Diagonal mass adaptation, target acceptance 0.9, max depth 10; sequential chains.
-- Identical initial positions, seeds `seed + chain`; callers should choose a
-  finite initial position with a usable gradient. No jitter/init retry policy.
-- Samples are **unconstrained**, in the reported `layout` order. Transformation,
-  deterministics and conversion to InferenceData are not implemented here.
-- No Stan, JAX, normalizing flows, parallelism or existing trace storage backends.
-- The compiler uses PyTensor's `vm.jit_fn`, so package-version compatibility
-  needs explicit testing. Errors in unsupported compiled operations can abort
-  the WASM call; this is not a production error-recovery API.
-- The pinned build retains unused wasm-bindgen imports. Throwing guards make
-  any unexpected use fail rather than silently supplying a fake implementation.
-
-## Experimental evidence
-
-A 179-week, 15-parameter PyMC-Marketing 1.1.0 MMM completed 2 chains of 750 warmup
-and 500 retained draws per chain. Native arm64 sampling took 0.801 s, browser
-sampling 8.407 s; model preparation/compilation took 11.893/14.757 s respectively.
-These are single runs of the original prototype on the same Mac at different
-times, not controlled repeated benchmarks of this API. Sampling time
-includes warmup and serialization, excluding imports, compilation, independent
-numerical validation and posterior diagnostics.
-
-Both runs had zero retained divergences, but max R-hat was 1.018/1.023 and min
-bulk ESS 125/183. They do not establish convergence or a speedup at equivalent
-precision over PyMC NUTS. Browser logp/gradient agreed with independent PyMC
-functions at three positions (maximum absolute errors 2.84e-13/1.10e-11).
-
-The tests here separately cover Gaussian posterior moments in the actual Rust
-WASM module, bridge memory growth, progress/error handling, transformed PyMC
-logp/gradients, and frozen shared data. The Node bridge test substitutes a JS
-Gaussian callback; it does not test a browser Numba runtime. A full Xeus browser
-integration remains a manual check because no runtime is bundled here.
-
-The general compiler and JS bridge were also manually checked against
-that same MMM in the browser: 8.242 s sampling, 14.847 s preparation/compilation,
-80,911 logp evaluations, zero divergences, max R-hat 1.0233 and min bulk ESS
-183.4, matching the prototype's posterior diagnostics.
-
-## Distribution and status
-
-GitHub Actions builds a downloadable `nuts-rs-wasm` artifact on pushes to main
-and pull requests. It contains the WASM module, `bridge.mjs`, `compile_model.py`,
-and documentation. Serve these files alongside your application's compatible
-Python runtime on any static host. There is no sampling server.
-
-No PyPI/npm package or GitHub Release has been published yet. The runtime is
-not bundled, and this is not a turnkey installation for stock Pyodide. See the
-compatibility and API limitations above before embedding it.
-
-The implementation was first proposed in
-[nutpie #345](https://github.com/pymc-devs/nutpie/pull/345), then extracted here
-because it uses nuts-rs directly rather than Nutpie's Python integration.
+A manual MMM check of the Arrow/high-level API also completed all 1,000 retained
+draws, live plots, prediction and four Arrow downloads: 8.5 s sampling and 29.9 s
+model preparation plus sampling, zero divergences, max R-hat 1.023, min ESS 183.
+Browser cancellation during initialization was checked separately.

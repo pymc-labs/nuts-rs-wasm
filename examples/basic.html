@@ -1,0 +1,31 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>nuts-rs-wasm example</title>
+<style>body{font:16px system-ui;max-width:800px;margin:3rem auto;padding:1rem}textarea{width:100%;height:12rem}button,input{font:inherit;margin:.5rem}pre{white-space:pre-wrap}a{display:block}</style>
+<h1>Sample a PyMC model in the browser</h1>
+<label>Compatible runtime URL <input id="runtime" value="/runtime/"></label>
+<label>Xeus environment <input id="environment" value="pymc-marketing-wasm"></label>
+<textarea id="code" aria-label="Python model code">import pymc as pm
+with pm.Model() as model:
+    mu = pm.Normal("mu", initval=0.1)
+    sigma = pm.HalfNormal("sigma", initval=1.0)
+    pm.Normal("observed", mu, sigma, observed=[1.2, 0.8, 1.5])</textarea>
+<button id="start">Sample</button><button id="stop" disabled>Stop</button>
+<pre id="status" role="status">Configure a compatible Xeus runtime before starting.</pre><div id="downloads"></div>
+<script type="module">
+import {createSampler} from '../browser-artifact/client.mjs';
+const $=id=>document.getElementById(id);let sampler,controller,urls=[];
+$('stop').onclick=()=>controller.abort();
+$('start').onclick=async()=>{
+ $('start').disabled=true;$('stop').disabled=false;urls.forEach(URL.revokeObjectURL);urls=[];$('downloads').replaceChildren();
+ sampler?.close();controller=new AbortController();let count=0;
+ try{
+  sampler=createSampler({runtimeUrl:$('runtime').value,environment:$('environment').value});
+  const result=await sampler.sample($('code').value,{signal:controller.signal,
+   onPhase:s=>$('status').textContent=s,
+   onProgress:p=>$('status').textContent=`Chain ${p.chain+1}, iteration ${p.index+1}. ${count} retained draws.`,
+   onSamples:b=>{count+=b.draws;}});
+  $('status').textContent=`Complete: ${count} retained draws. ${result.sampling_seconds.toFixed(2)} s sampling.`;
+  for(const t of result.traces){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t.bytes]));urls.push(a.href);a.download=`chain-${t.chain+1}-${t.group}.arrow`;a.textContent=a.download;$('downloads').append(a);}
+ }catch(e){$('status').textContent=e.name==='AbortError'?'Stopped.':String(e);}
+ finally{$('start').disabled=false;$('stop').disabled=true;}
+};
+</script></html>

@@ -36,6 +36,28 @@ class CompilerTests(unittest.TestCase):
         self.assertEqual(frozen, value)
         self.assertNotAlmostEqual(frozen, logp(shifted))
 
+    def test_expansion_uses_model_transforms_and_deterministics(self):
+        with pm.Model(coords={"category": ["a", "b", "c"]}) as model:
+            scale = pm.HalfNormal("scale", initval=1.7)
+            prob = pm.Beta("prob", 2, 3, initval=0.4)
+            simplex = pm.Dirichlet(
+                "simplex", np.ones(3), initval=[0.2, 0.3, 0.5], dims="category"
+            )
+            pm.Deterministic("derived", scale * prob + simplex, dims="category")
+        compiled = compile_browser_model(model)
+        pointer = ctypes.POINTER(ctypes.c_double)
+        status = compiled.expand_callback.ctypes(
+            compiled.initial.ctypes.data_as(pointer),
+            compiled.expanded.ctypes.data_as(pointer),
+        )
+        self.assertEqual(status, 0)
+        expected = [1.7, 0.4, 0.2, 0.3, 0.5, 0.88, 0.98, 1.18]
+        np.testing.assert_allclose(compiled.expanded, expected, atol=1e-9)
+        self.assertEqual(compiled.expanded_layout[-1]["dims"], ["category"])
+        self.assertEqual(compiled.coords["category"], ["a", "b", "c"])
+        self.assertEqual(len(compiled.initial), 4)
+        self.assertEqual(len(compiled.expanded), 8)
+
     def test_discrete_rejected(self):
         with pm.Model() as model:
             pm.Bernoulli("x", 0.5)
