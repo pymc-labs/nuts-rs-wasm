@@ -17,6 +17,11 @@ with pm.Model() as model:
 compiled = compile_browser_model(model)
 result = sample_native(compiled, library, chains=2, tune=200, draws=200)
 assert len(result["traces"]) == 4
+starts = np.asarray(result["initial_positions"])
+assert np.all(starts >= compiled.initial - 1)
+assert np.all(starts < compiled.initial + 1)
+assert not np.array_equal(starts[0], starts[1])
+assert not np.array_equal(starts[0], compiled.initial)
 expanded = np.asarray(result["expanded_samples"])
 assert np.all(expanded[:, :, 0] > 0)
 np.testing.assert_allclose(expanded[:, :, 1], 2 * expanded[:, :, 0])

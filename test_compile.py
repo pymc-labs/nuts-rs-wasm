@@ -76,6 +76,78 @@ class CompilerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             compiled.initial[0] = 100.0
 
+    def test_mutable_callbacks_update_density_gradient_and_deterministics(self):
+        with pm.Model() as model:
+            data = pm.Data("data", np.array([1.0, 2.0, 3.0]))
+            index = pm.Data("index", np.array([0, 2], dtype="int32"))
+            x = pm.Normal("x", initval=0.2)
+            pm.Normal("y", x, 1, observed=data)
+            pm.Deterministic("prediction", x + data[index])
+        compiled = compile_browser_model(model, mutable_data=["data", "index"])
+        other = compile_browser_model(model, mutable_data=["data", "index"])
+        addresses = (
+            compiled.callback.address,
+            compiled.expand_callback.address,
+            compiled.data.ctypes.data,
+        )
+        pointer = ctypes.POINTER(ctypes.c_double)
+
+        def evaluate():
+            value = compiled.callback.ctypes(
+                compiled.initial.ctypes.data_as(pointer),
+                compiled.gradient.ctypes.data_as(pointer),
+                compiled.data.ctypes.data_as(pointer),
+            )
+            compiled.expand_callback.ctypes(
+                compiled.initial.ctypes.data_as(pointer),
+                compiled.expanded.ctypes.data_as(pointer),
+                compiled.data.ctypes.data_as(pointer),
+            )
+            return value
+
+        before = evaluate()
+        compiled.update_data({"data": [3.0, 4.0, 5.0], "index": [1, 2]})
+        after = evaluate()
+        self.assertNotEqual(before, after)
+        np.testing.assert_allclose(after, model.compile_logp()(model.initial_point()))
+        np.testing.assert_allclose(
+            compiled.gradient, model.compile_dlogp()(model.initial_point())
+        )
+        np.testing.assert_allclose(compiled.expanded, [0.2, 4.2, 5.2])
+        self.assertEqual(
+            addresses,
+            (
+                compiled.callback.address,
+                compiled.expand_callback.address,
+                compiled.data.ctypes.data,
+            ),
+        )
+        np.testing.assert_array_equal(other.data, [1.0, 2.0, 3.0, 0.0, 2.0])
+        other.activate_data()
+        np.testing.assert_array_equal(data.get_value(), [1.0, 2.0, 3.0])
+        compiled.activate_data()
+        np.testing.assert_array_equal(data.get_value(), [3.0, 4.0, 5.0])
+        for update in [
+            {"data": [1.0]},
+            {"missing": [1.0]},
+            {"data": [1.0, float("nan"), 3.0]},
+            {"data": [9.0, 9.0, 9.0], "index": [0.5, 1.0]},
+        ]:
+            with self.assertRaises(ValueError):
+                compiled.update_data(update)
+            np.testing.assert_array_equal(compiled.data, [3.0, 4.0, 5.0, 1.0, 2.0])
+
+    def test_data_dependent_output_shape_change_is_atomic(self):
+        with pm.Model() as model:
+            data = pm.Data("data", np.array([1.0, -1.0, 2.0]))
+            x = pm.Normal("x", initval=0.2)
+            pm.Deterministic("selected", x + data[data > 0])
+        compiled = compile_browser_model(model, mutable_data=True)
+        with self.assertRaisesRegex(ValueError, "output shape"):
+            compiled.update_data({"data": [1.0, 1.0, 2.0]})
+        np.testing.assert_array_equal(compiled.data, [1.0, -1.0, 2.0])
+        np.testing.assert_array_equal(data.get_value(), [1.0, -1.0, 2.0])
+
     def test_discrete_rejected(self):
         with pm.Model() as model:
             pm.Bernoulli("x", 0.5)

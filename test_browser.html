@@ -24,12 +24,43 @@ document.querySelector('#run').onclick=async()=>{
   assert(!('samples' in second),'Unconstrained retention disabled');
   assert(JSON.stringify(first.expanded_samples.flat(2))===JSON.stringify(Array.from(second.expanded_samples)),'Fixed seed reuse');
   assert(second.traces.every(t=>t.bytes.byteLength>0),'Final Arrow owns its data');
+  status.textContent='Checking stream-only output';
+  const streamed=[];
+  const stream=await sampler.sample(handle,{chains:2,tune:25,draws:12,seed:42,resultFormat:'stream',onSamples:b=>streamed.push(...b.values)});
+  assert(JSON.stringify(streamed)===JSON.stringify(Array.from(second.expanded_samples)),'Stream-only seeded equivalence');
+  assert(!stream.expanded_samples&&!stream.stats&&!stream.samples&&stream.traces.length===0,'No retained stream results');
+  assert(first.initial_positions[0][0]!==first.initial_positions[1][0],'Distinct jittered starts');
+  const shallow=await sampler.sample(handle,{chains:1,tune:20,draws:10,maxDepth:1,jitter:0,resultFormat:'binary'});
+  assert(shallow.initial_positions[0][0]===.1,'Jitter disabled');
+  assert(Array.from(shallow.stats).filter((_,i)=>i%3===1).every(x=>x<=1),'Tree depth applied');
+  status.textContent='Checking mutable data callbacks';
+  const mutableSource=`import numpy as np
+with pm.Model() as model:
+    data=pm.Data('data',np.array([1.,2.]))
+    x=pm.Normal('x',initval=.2)
+    pm.Normal('y',x,1,observed=data)
+    pm.Deterministic('prediction',x+data)`;
+  const mutable=await sampler.prepare(mutableSource,{mutableData:['data']});
+  const mutableOpts={chains:1,tune:25,draws:10,seed:42,resultFormat:'binary',bridgeCache:'views'};
+  const before=await sampler.sample(mutable,mutableOpts);
+  await sampler.execute(`_test_pointers=(_nuts_compiled.callback.address,_nuts_compiled.expand_callback.address,_nuts_compiled.data.ctypes.data)`);
+  await sampler.updateData(mutable,{data:[4.,5.]});
+  const after=await sampler.sample(mutable,{...mutableOpts,afterSample:`assert _test_pointers==(_nuts_compiled.callback.address,_nuts_compiled.expand_callback.address,_nuts_compiled.data.ctypes.data)
+assert np.allclose(idata.posterior.prediction.values[...,0],idata.posterior.x.values+4.)
+assert np.allclose(model['data'].get_value(),[4.,5.])`});
+  assert(after.compile_seconds===0,'Data update avoided compilation');
+  assert(JSON.stringify(Array.from(before.expanded_samples))!==JSON.stringify(Array.from(after.expanded_samples)),'Changed posterior with updated data');
+  let invalid=false;try{await sampler.updateData(mutable,{data:[1.]});}catch{invalid=true;}assert(invalid,'Shape change rejected');
+  await sampler.updateData(mutable,{data:[1.,2.]});
+  const restored=await sampler.sample(mutable,mutableOpts);
+  assert(JSON.stringify(Array.from(before.expanded_samples))===JSON.stringify(Array.from(restored.expanded_samples)),'Restored data reproduces original draws');
+  await sampler.release(mutable);
   status.textContent='Checking handle lifetime';
   await sampler.release(handle);
   let rejected=false;try{await sampler.sample(handle,opts);}catch{rejected=true;}assert(rejected,'Released handle rejected');
   const other=await sampler.prepare(source);
   sampler.cancel();rejected=false;try{await sampler.sample(other,opts);}catch{rejected=true;}assert(rejected,'Cancelled handle rejected');
-  status.textContent='PASS: concurrent initialization, reuse, fixed seeds, binary results, xarray coordinates/deterministics, callback ownership, Arrow, release and cancellation';
+  status.textContent='PASS: mutable data without recompilation, stream-only equivalence, jitter, tree depth, concurrent initialization, reuse, fixed seeds, binary results, xarray coordinates/deterministics, callback ownership, Arrow, release and cancellation';
  }catch(e){status.textContent=String(e.stack||e);}
  finally{sampler.close();}
 };
