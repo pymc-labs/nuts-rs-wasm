@@ -33,7 +33,7 @@ shutil.copy2(
 (stage / "index.html").write_text(
     '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>nuts-rs-wasm</title><style>body{font:18px/1.6 system-ui;max-width:760px;margin:50px auto;padding:20px}a{color:#1257d5}</style><h1>nuts-rs-wasm</h1><p>Run a real PyMC-Marketing model on your device.</p><p><a href="notebook.html">Open the interactive MMM →</a></p><p><a href="marketing-mix-in-your-browser.ipynb" download>Download the notebook</a></p><p><a href="benchmark.html">Repeat the five-fit benchmark</a></p>'
 )
-(stage / "START-HERE.md").write_text("""# nuts-rs-wasm v0.1.0-alpha.1
+(stage / "START-HERE.md").write_text("""# nuts-rs-wasm v0.1.0
 
 Extract both the adapter and runtime archives into the same directory.
 Serve this directory with `python -m http.server 8000`, then open
@@ -62,16 +62,16 @@ def manifest(directory):
                 }
             )
     (directory / "MANIFEST.json").write_text(
-        json.dumps({"version": "0.1.0-alpha.1", "files": files}, indent=2) + "\n"
+        json.dumps({"version": "0.1.0", "files": files}, indent=2) + "\n"
     )
 
 
 manifest(stage / "runtime")
 manifest(stage / "nuts")
 archives = [
-    ("nuts-rs-wasm-runtime-v0.1.0-alpha.1.tar.gz", ["runtime"]),
+    ("nuts-rs-wasm-runtime-v0.1.0.tar.gz", ["runtime"]),
     (
-        "nuts-rs-wasm-adapter-v0.1.0-alpha.1.tar.gz",
+        "nuts-rs-wasm-adapter-v0.1.0.tar.gz",
         [
             "nuts",
             "mmm",
