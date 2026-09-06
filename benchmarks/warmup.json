@@ -1,0 +1,188 @@
+{
+  "platform": "native",
+  "chains": 2,
+  "tune": 750,
+  "draws": 500,
+  "runs": [
+    {
+      "model": "mmm",
+      "mode": "before",
+      "seed": 42,
+      "sampling_seconds": 0.884820666979067,
+      "expansion_calls": 2500,
+      "logp_evaluations": 80041,
+      "leapfrog_steps": 80016
+    },
+    {
+      "model": "mmm",
+      "mode": "after",
+      "seed": 42,
+      "sampling_seconds": 0.8847864589770325,
+      "expansion_calls": 1000,
+      "logp_evaluations": 80041,
+      "leapfrog_steps": 80016
+    },
+    {
+      "model": "mmm",
+      "mode": "after",
+      "seed": 142,
+      "sampling_seconds": 0.8416086249635555,
+      "expansion_calls": 1000,
+      "logp_evaluations": 79785,
+      "leapfrog_steps": 79761
+    },
+    {
+      "model": "mmm",
+      "mode": "before",
+      "seed": 142,
+      "sampling_seconds": 0.8550885830190964,
+      "expansion_calls": 2500,
+      "logp_evaluations": 79785,
+      "leapfrog_steps": 79761
+    },
+    {
+      "model": "mmm",
+      "mode": "before",
+      "seed": 242,
+      "sampling_seconds": 0.8603806659812108,
+      "expansion_calls": 2500,
+      "logp_evaluations": 80756,
+      "leapfrog_steps": 80732
+    },
+    {
+      "model": "mmm",
+      "mode": "after",
+      "seed": 242,
+      "sampling_seconds": 0.9732321669580415,
+      "expansion_calls": 1000,
+      "logp_evaluations": 80756,
+      "leapfrog_steps": 80732
+    },
+    {
+      "model": "mmm",
+      "mode": "after",
+      "seed": 342,
+      "sampling_seconds": 0.932118333003018,
+      "expansion_calls": 1000,
+      "logp_evaluations": 82541,
+      "leapfrog_steps": 82517
+    },
+    {
+      "model": "mmm",
+      "mode": "before",
+      "seed": 342,
+      "sampling_seconds": 0.953965499997139,
+      "expansion_calls": 2500,
+      "logp_evaluations": 82541,
+      "leapfrog_steps": 82517
+    },
+    {
+      "model": "mmm",
+      "mode": "before",
+      "seed": 442,
+      "sampling_seconds": 0.8921179579920135,
+      "expansion_calls": 2500,
+      "logp_evaluations": 78627,
+      "leapfrog_steps": 78603
+    },
+    {
+      "model": "mmm",
+      "mode": "after",
+      "seed": 442,
+      "sampling_seconds": 0.8758703330531716,
+      "expansion_calls": 1000,
+      "logp_evaluations": 78627,
+      "leapfrog_steps": 78603
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "before",
+      "seed": 42,
+      "sampling_seconds": 0.7100579999969341,
+      "expansion_calls": 2500,
+      "logp_evaluations": 6186,
+      "leapfrog_steps": 6160
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "after",
+      "seed": 42,
+      "sampling_seconds": 0.2762647910276428,
+      "expansion_calls": 1000,
+      "logp_evaluations": 6186,
+      "leapfrog_steps": 6160
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "after",
+      "seed": 142,
+      "sampling_seconds": 0.285789166984614,
+      "expansion_calls": 1000,
+      "logp_evaluations": 6222,
+      "leapfrog_steps": 6192
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "before",
+      "seed": 142,
+      "sampling_seconds": 0.6948896670364775,
+      "expansion_calls": 2500,
+      "logp_evaluations": 6222,
+      "leapfrog_steps": 6192
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "before",
+      "seed": 242,
+      "sampling_seconds": 0.6908436670200899,
+      "expansion_calls": 2500,
+      "logp_evaluations": 6318,
+      "leapfrog_steps": 6288
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "after",
+      "seed": 242,
+      "sampling_seconds": 0.28498799999943003,
+      "expansion_calls": 1000,
+      "logp_evaluations": 6318,
+      "leapfrog_steps": 6288
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "after",
+      "seed": 342,
+      "sampling_seconds": 0.28763420903123915,
+      "expansion_calls": 1000,
+      "logp_evaluations": 6312,
+      "leapfrog_steps": 6284
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "before",
+      "seed": 342,
+      "sampling_seconds": 0.8276378340087831,
+      "expansion_calls": 2500,
+      "logp_evaluations": 6312,
+      "leapfrog_steps": 6284
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "before",
+      "seed": 442,
+      "sampling_seconds": 0.7105274579953402,
+      "expansion_calls": 2500,
+      "logp_evaluations": 6286,
+      "leapfrog_steps": 6258
+    },
+    {
+      "model": "expensive_deterministic",
+      "mode": "after",
+      "seed": 442,
+      "sampling_seconds": 0.27823849994456396,
+      "expansion_calls": 1000,
+      "logp_evaluations": 6286,
+      "leapfrog_steps": 6258
+    }
+  ]
+}

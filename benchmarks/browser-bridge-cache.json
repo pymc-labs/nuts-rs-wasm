@@ -1,0 +1,190 @@
+{
+  "platform": "browser-wasm",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "preparation_wall_seconds": {
+    "reused": 31.28430000001192
+  },
+  "measurement_scope": "Selected measured fields; single prepared MMM handle; untimed 100 tune +20 draw fit per bridge; 5 seeds x3 bridge modes with alternating order. Large consecutive timing outliers indicate unstable execution conditions. These measurements do not establish an end-to-end speedup.",
+  "runs": [
+    {
+      "seed": 42,
+      "bridgeCache": "none",
+      "sampling_seconds": 13.685,
+      "wall_seconds": 13.982400000035764,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 80911,
+      "divergences": 0,
+      "max_rhat": 1.0232514006155955,
+      "min_ess": 183.42246617814075
+    },
+    {
+      "seed": 42,
+      "bridgeCache": "callbacks",
+      "sampling_seconds": 12.886700000047684,
+      "wall_seconds": 13.011899999976158,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 80911,
+      "divergences": 0,
+      "max_rhat": 1.0232514006155955,
+      "min_ess": 183.42246617814075
+    },
+    {
+      "seed": 42,
+      "bridgeCache": "views",
+      "sampling_seconds": 9.930799999952317,
+      "wall_seconds": 10.044899999976158,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 80911,
+      "divergences": 0,
+      "max_rhat": 1.0232514006155955,
+      "min_ess": 183.42246617814075
+    },
+    {
+      "seed": 142,
+      "bridgeCache": "views",
+      "sampling_seconds": 8.8875,
+      "wall_seconds": 8.983800000011922,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 76717,
+      "divergences": 0,
+      "max_rhat": 1.0104939098373953,
+      "min_ess": 184.71204047293068
+    },
+    {
+      "seed": 142,
+      "bridgeCache": "callbacks",
+      "sampling_seconds": 8.243599999964237,
+      "wall_seconds": 8.352200000047684,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 76717,
+      "divergences": 0,
+      "max_rhat": 1.0104939098373953,
+      "min_ess": 184.71204047293068
+    },
+    {
+      "seed": 142,
+      "bridgeCache": "none",
+      "sampling_seconds": 9.715100000023842,
+      "wall_seconds": 9.847,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 76717,
+      "divergences": 0,
+      "max_rhat": 1.0104939098373953,
+      "min_ess": 184.71204047293068
+    },
+    {
+      "seed": 242,
+      "bridgeCache": "none",
+      "sampling_seconds": 11.3445,
+      "wall_seconds": 11.475600000023842,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 74182,
+      "divergences": 0,
+      "max_rhat": 1.017257642916464,
+      "min_ess": 110.29479394884372
+    },
+    {
+      "seed": 242,
+      "bridgeCache": "callbacks",
+      "sampling_seconds": 10.2695,
+      "wall_seconds": 10.40189999997616,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 74182,
+      "divergences": 0,
+      "max_rhat": 1.017257642916464,
+      "min_ess": 110.29479394884372
+    },
+    {
+      "seed": 242,
+      "bridgeCache": "views",
+      "sampling_seconds": 41.77089999997616,
+      "wall_seconds": 42.55140000003576,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 74182,
+      "divergences": 0,
+      "max_rhat": 1.017257642916464,
+      "min_ess": 110.29479394884372
+    },
+    {
+      "seed": 342,
+      "bridgeCache": "views",
+      "sampling_seconds": 40.25539999997616,
+      "wall_seconds": 40.818,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 72039,
+      "divergences": 0,
+      "max_rhat": 1.015616056308721,
+      "min_ess": 186.0708922041911
+    },
+    {
+      "seed": 342,
+      "bridgeCache": "callbacks",
+      "sampling_seconds": 41.2905,
+      "wall_seconds": 41.6265,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 72039,
+      "divergences": 0,
+      "max_rhat": 1.015616056308721,
+      "min_ess": 186.0708922041911
+    },
+    {
+      "seed": 342,
+      "bridgeCache": "none",
+      "sampling_seconds": 8.678099999964237,
+      "wall_seconds": 8.807,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 72039,
+      "divergences": 0,
+      "max_rhat": 1.015616056308721,
+      "min_ess": 186.0708922041911
+    },
+    {
+      "seed": 442,
+      "bridgeCache": "none",
+      "sampling_seconds": 8.814899999976157,
+      "wall_seconds": 8.920600000023843,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 77367,
+      "divergences": 0,
+      "max_rhat": 1.02075628081295,
+      "min_ess": 125.10507761338422
+    },
+    {
+      "seed": 442,
+      "bridgeCache": "callbacks",
+      "sampling_seconds": 8.545799999952317,
+      "wall_seconds": 8.640799999952316,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 77367,
+      "divergences": 0,
+      "max_rhat": 1.02075628081295,
+      "min_ess": 125.10507761338422
+    },
+    {
+      "seed": 442,
+      "bridgeCache": "views",
+      "sampling_seconds": 8.476,
+      "wall_seconds": 8.572899999976158,
+      "compile_seconds": 0,
+      "model_compile_seconds": 29.4141,
+      "logp_evaluations": 77367,
+      "divergences": 0,
+      "max_rhat": 1.02075628081295,
+      "min_ess": 125.10507761338422
+    }
+  ]
+}

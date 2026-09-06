@@ -1,6 +1,6 @@
 <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Repeated MMM benchmark</title>
 <style>body{font:16px system-ui;max-width:1000px;margin:30px auto}pre{white-space:pre-wrap}button{padding:14px;font:inherit}</style>
-<h1>Repeated MMM benchmark</h1><p>Five fits, sequential chains, Numba model + expansion and Rust Arrow storage. Imports are preloaded; each fit rebuilds and recompiles the model.</p><button id="run">Run five browser fits</button><button id="stop" disabled>Stop</button><p id="status" role="status">Ready</p><pre id="results"></pre>
+<h1>Repeated MMM benchmark</h1><p>Five fits, sequential chains, Numba model + expansion and Rust Arrow storage. Imports are preloaded. Compare five fresh compilations with five fits sharing one explicitly prepared model.</p><label>Mode <select id="mode"><option value="both">Cold and reused (ten fits)</option><option value="cold">Cold compilation (five fits)</option><option value="reused">Reused model (five fits)</option></select></label> <label>Bridge <select id="bridge"><option value="callbacks">Callback caching only (default)</option><option value="views">Callback and view caching (experimental)</option><option value="none">Uncached bridge</option><option value="all">Compare all three bridges</option></select></label> <button id="run">Run browser benchmark</button><button id="stop" disabled>Stop</button><p id="status" role="status">Ready</p><pre id="results"></pre>
 <script type="module">
 import {createSampler} from './nuts/client.mjs';
 const get=async p=>{const r=await fetch(p);if(!r.ok)throw Error(p);return r.text();};
@@ -10,27 +10,49 @@ document.querySelector('#run').onclick=async()=>{
   const button=document.querySelector('#run'),status=document.querySelector('#status'),view=document.querySelector('#results');
   button.disabled=true;document.querySelector('#stop').disabled=false;
   const runs=[];let buffer='',report;
+  const mode=document.querySelector('#mode').value, bridgeCache=document.querySelector('#bridge').value, preparations={};
   try{
     const [source,csv,diagnostics]=await Promise.all(['./mmm/model.py','./mmm/mmm_example.csv','./mmm/diagnostics.py'].map(get));
     sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
     status.textContent='Loading runtime and preloading imports';await sampler.initialize();
     await sampler.execute("import os\nos.environ['PYTENSOR_FLAGS']='cxx=,blas__ldflags=,numba__cache=False'\nimport pandas, arviz_stats, pymc_marketing.mmm");
+    const preparationOptions={files:{'/mmm_example.csv':csv},
+      varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution','gamma_fourier']};
+    for(const fitMode of mode==='both'?['cold','reused']:[mode]){
+    let handle;
+    if(fitMode==='reused'){
+      status.textContent='Preparing model once for five reused fits';
+      const started=performance.now();
+      handle=await sampler.prepare('SEASONALITY = True\n'+source,preparationOptions);
+      preparations[fitMode]=(performance.now()-started)/1000;
+      if(bridgeCache==='all')for(const cacheMode of ['none','callbacks','views']){
+        status.textContent=`Warming ${cacheMode} bridge`;
+        await sampler.sample(handle,{chains:1,tune:100,draws:20,seed:41,bridgeCache:cacheMode});
+      }
+    }
     for(const seed of [42,142,242,342,442]){
+    const cacheModes=bridgeCache==='all'?['none','callbacks','views']:[bridgeCache];
+    if(bridgeCache==='all'&&[142,342].includes(seed))cacheModes.reverse();
+    for(const cacheMode of cacheModes){
       let received=0;report=null;
-      const result=await sampler.sample('SEASONALITY = True\n'+source,{
-        chains:2,tune:750,draws:500,seed,targetAccept:.9,
-        files:{'/mmm_example.csv':csv},
-        varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution','gamma_fourier'],
+      const started=performance.now();
+      const result=await sampler.sample(handle??('SEASONALITY = True\n'+source),{
+        chains:2,tune:750,draws:500,seed,targetAccept:.9,bridgeCache:cacheMode,
+        ...(handle?{}:preparationOptions),
         afterSample:diagnostics,
-        onPhase:p=>status.textContent=`Fit ${runs.length+1}/5 · ${p}`,
+        onPhase:p=>status.textContent=`${fitMode} ${cacheMode} · fit ${runs.length+1} · ${p}`,
         onSamples:b=>{received+=b.draws;},
         onOutput:t=>{buffer+=t;const lines=buffer.split('\n');buffer=lines.pop();for(const l of lines)if(l.startsWith('MMM_EVENT ')){const e=JSON.parse(l.slice(10));if(e.type==='diagnostics')report=e;}},
       });
       if(!report||received!==1000||result.traces.length!==4)throw Error('Incomplete samples/traces/diagnostics');
-      delete report.type;runs.push({seed,...report});
-      view.textContent=JSON.stringify({platform:'browser-wasm',userAgent:navigator.userAgent,runs},null,2);
+      delete report.type;runs.push({mode:fitMode,bridgeCache:cacheMode,seed,...report,compile_seconds:result.compile_seconds,
+        model_compile_seconds:result.model_compile_seconds,wall_seconds:(performance.now()-started)/1000});
+      view.textContent=JSON.stringify({platform:'browser-wasm',userAgent:navigator.userAgent,bridgeCache,preparation_wall_seconds:preparations,runs},null,2);
     }
-    status.textContent='Complete · 5/5 fits';
+    }
+    if(handle)await sampler.release(handle);
+    }
+    status.textContent=`Complete · ${runs.length} fits`;
   }catch(e){status.textContent=String(e.stack||e);}
   finally{sampler?.close();button.disabled=false;document.querySelector('#stop').disabled=true;}
 };

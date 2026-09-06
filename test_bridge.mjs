@@ -46,3 +46,37 @@ for (const trace of result.traces) {
   assert.ok(trace.bytes.length > 1000);
   if (process.env.ARROW_TEST_DIR) await writeFile(`${process.env.ARROW_TEST_DIR}/${trace.chain}-${trace.group}.arrow`, trace.bytes);
 }
+
+// Warmup must never call deterministic expansion, including around 10-draw batches.
+for (const tune of [1, 9, 10, 11]) {
+  for (const draws of [1, 9, 10, 11]) {
+    let expansions = 0;
+    const events = [], batches = [];
+    const countedRuntime = {...runtime, wasmTable: {get(pointer) {
+      if (pointer === 8) return (xp, out) => {
+        expansions++;
+        const x = new Float64Array(memory.buffer, xp, 2);
+        new Float64Array(memory.buffer, out, 2).set([x[0] * 2, x[1] * 2]);
+        return 0;
+      };
+      return runtime.wasmTable.get(pointer);
+    }}};
+    const countResult = await sample({...options, tune, draws,
+      runtime: countedRuntime,
+      model: {...model, expand_pointer: 8, expanded_pointer: 32},
+      onProgress: event => events.push(event), onSamples: batch => batches.push(batch)});
+    assert.equal(expansions, 2 * draws);
+    assert.equal(batches.reduce((sum, b) => sum + b.draws, 0), 2 * draws);
+    for (let chain = 0; chain < 2; chain++) {
+      const chainBatches = batches.filter(b => b.chain === chain);
+      assert.deepEqual(chainBatches.map(b => b.start), draws > 10 ? [0, 10] : [0]);
+      assert.deepEqual(events.filter(e => e.chain === chain).map(e => [e.index, e.tuning]),
+        Array.from({length: tune + draws}, (_, i) => i)
+          .filter(i => i % 10 === 0 || i === tune + draws - 1)
+          .map(i => [i, i < tune]));
+      assert.deepEqual(countResult.expanded_samples[chain],
+        countResult.samples[chain].map(x => x.map(v => 2 * v)));
+    }
+  }
+}
+console.log('Warmup expansion counts, short tuning, batch boundaries and progress passed');

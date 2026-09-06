@@ -4,6 +4,6 @@
   "private": true,
   "type": "module",
   "exports": {".": "./client.mjs", "./bridge": "./bridge.mjs"},
-  "scripts": {"build": "node build.mjs", "test": "node --test test_client.mjs"},
+  "scripts": {"build": "node build.mjs", "test": "node --test test_client.mjs test_binary.mjs test_bridge_memory.mjs"},
   "dependencies": {"comlink": "4.4.2"}
 }

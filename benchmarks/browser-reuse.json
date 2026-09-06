@@ -1,0 +1,110 @@
+{
+  "platform": "browser-wasm",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "scope": "Selected measured fields from ten-fit browser run, uncached JavaScript bridge; runtime warmup optimization and binary worker-local Python ingestion enabled. Native build and other desktop activity overlapped: exploratory timings, not a controlled speedup estimate.",
+  "preparation_wall_seconds": {
+    "reused": 25.215300000011922
+  },
+  "runs": [
+    {
+      "mode": "cold",
+      "seed": 42,
+      "compile_seconds": 20.2986,
+      "sampling_seconds": 9.249400000035763,
+      "wall_seconds": 30.79310000002384,
+      "model_compile_seconds": 20.2986,
+      "divergences": 0,
+      "logp_evaluations": 80911
+    },
+    {
+      "mode": "cold",
+      "seed": 142,
+      "compile_seconds": 14.259900000000002,
+      "sampling_seconds": 8.082700000047684,
+      "wall_seconds": 22.53930000001192,
+      "model_compile_seconds": 14.259900000000002,
+      "divergences": 0,
+      "logp_evaluations": 76717
+    },
+    {
+      "mode": "cold",
+      "seed": 242,
+      "compile_seconds": 22.1577,
+      "sampling_seconds": 11.634399999976159,
+      "wall_seconds": 34.098,
+      "model_compile_seconds": 22.1577,
+      "divergences": 0,
+      "logp_evaluations": 74182
+    },
+    {
+      "mode": "cold",
+      "seed": 342,
+      "compile_seconds": 24.589,
+      "sampling_seconds": 10.799300000011922,
+      "wall_seconds": 35.7475,
+      "model_compile_seconds": 24.589,
+      "divergences": 0,
+      "logp_evaluations": 72039
+    },
+    {
+      "mode": "cold",
+      "seed": 442,
+      "compile_seconds": 24.246199999999988,
+      "sampling_seconds": 12.866100000023842,
+      "wall_seconds": 37.52739999997616,
+      "model_compile_seconds": 24.246199999999988,
+      "divergences": 0,
+      "logp_evaluations": 77367
+    },
+    {
+      "mode": "reused",
+      "seed": 42,
+      "compile_seconds": 0,
+      "sampling_seconds": 13.083399999976159,
+      "wall_seconds": 13.279,
+      "model_compile_seconds": 25.1464,
+      "divergences": 0,
+      "logp_evaluations": 80911
+    },
+    {
+      "mode": "reused",
+      "seed": 142,
+      "compile_seconds": 0,
+      "sampling_seconds": 18.0075,
+      "wall_seconds": 18.370399999976158,
+      "model_compile_seconds": 25.1464,
+      "divergences": 0,
+      "logp_evaluations": 76717
+    },
+    {
+      "mode": "reused",
+      "seed": 242,
+      "compile_seconds": 0,
+      "sampling_seconds": 13.929800000011921,
+      "wall_seconds": 14.138399999976158,
+      "model_compile_seconds": 25.1464,
+      "divergences": 0,
+      "logp_evaluations": 74182
+    },
+    {
+      "mode": "reused",
+      "seed": 342,
+      "compile_seconds": 0,
+      "sampling_seconds": 12.420100000023842,
+      "wall_seconds": 12.65819999998808,
+      "model_compile_seconds": 25.1464,
+      "divergences": 0,
+      "logp_evaluations": 72039
+    },
+    {
+      "mode": "reused",
+      "seed": 442,
+      "compile_seconds": 0,
+      "sampling_seconds": 12.425100000023843,
+      "wall_seconds": 12.589899999976158,
+      "model_compile_seconds": 25.1464,
+      "divergences": 0,
+      "logp_evaluations": 77367
+    }
+  ]
+}

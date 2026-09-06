@@ -1,0 +1,105 @@
+{
+  "generated_at": "2026-09-06T10:08:14.754Z",
+  "runtime": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
+  },
+  "description": "Summary from seven browser repetitions after per-mode warmup; actual WASM callbacks, rotating order. 200000 calls per width2 repetition, 20000 per width1024 repetition.",
+  "summary": [
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "none",
+      "median_ns_per_call": 125.50000011920929,
+      "min_ns_per_call": 124.49999988079071,
+      "max_ns_per_call": 129.4999998807907
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "callbacks",
+      "median_ns_per_call": 107.5,
+      "min_ns_per_call": 106.49999976158142,
+      "max_ns_per_call": 108.00000011920929
+    },
+    {
+      "width": 2,
+      "operation": "logp",
+      "mode": "views",
+      "median_ns_per_call": 77.5,
+      "min_ns_per_call": 76.49999976158142,
+      "max_ns_per_call": 80.50000011920929
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "none",
+      "median_ns_per_call": 128.0000001192093,
+      "min_ns_per_call": 126.99999988079071,
+      "max_ns_per_call": 135
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "callbacks",
+      "median_ns_per_call": 110.99999994039536,
+      "min_ns_per_call": 109.50000017881393,
+      "max_ns_per_call": 112.5
+    },
+    {
+      "width": 2,
+      "operation": "expand",
+      "mode": "views",
+      "median_ns_per_call": 76.99999988079071,
+      "min_ns_per_call": 75,
+      "max_ns_per_call": 81.49999976158142
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "none",
+      "median_ns_per_call": 1105.000001192093,
+      "min_ns_per_call": 1080.000001192093,
+      "max_ns_per_call": 1130.000001192093
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "callbacks",
+      "median_ns_per_call": 1064.9999976158142,
+      "min_ns_per_call": 1050,
+      "max_ns_per_call": 1094.999998807907
+    },
+    {
+      "width": 1024,
+      "operation": "logp",
+      "mode": "views",
+      "median_ns_per_call": 1069.999998807907,
+      "min_ns_per_call": 1064.9999976158142,
+      "max_ns_per_call": 1109.9999994039536
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "none",
+      "median_ns_per_call": 509.99999940395355,
+      "min_ns_per_call": 500,
+      "max_ns_per_call": 519.9999988079071
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "callbacks",
+      "median_ns_per_call": 500,
+      "min_ns_per_call": 494.9999988079071,
+      "max_ns_per_call": 509.99999940395355
+    },
+    {
+      "width": 1024,
+      "operation": "expand",
+      "mode": "views",
+      "median_ns_per_call": 509.99999940395355,
+      "min_ns_per_call": 494.9999988079071,
+      "max_ns_per_call": 520.0000017881393
+    }
+  ]
+}
