@@ -38,7 +38,7 @@ Use the hosted demo origin below, or extract both release archives and serve the
 from urllib.parse import quote
 import json
 
-demo_url = "https://bayesian-marketing-browser.thomas-wiecki.chatgpt.site"
+demo_url = "https://pymc-labs.github.io/nuts-rs-wasm"
 configuration = {
     "source": model_source,
     "seasonality": True,  # Change to False and rerun to compare.

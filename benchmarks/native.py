@@ -18,7 +18,7 @@ from compile_model import compile_browser_model
 from results import to_inference_data
 
 
-def sample_native(compiled, library, *, chains=2, tune=750, draws=500, seed=42):
+def sample_native(compiled, library, *, chains=2, tune=750, draws=500, seed=42, binary=False):
     lib = C.CDLL(str(library))
     lib.set_callback.argtypes = [C.c_size_t]
     lib.set_expand_callback.argtypes = [C.c_size_t]
@@ -53,6 +53,8 @@ def sample_native(compiled, library, *, chains=2, tune=750, draws=500, seed=42):
     metadata = json.dumps(compiled.expanded_layout).encode()
     if lib.set_variables(metadata, len(metadata)):
         raise ValueError("Invalid metadata")
+    lib.set_result_options.argtypes = [C.c_uint32, C.c_uint32]
+    lib.set_result_options(int(binary), 1)
     started = time.perf_counter()
     try:
         status = lib.run(
@@ -72,6 +74,17 @@ def sample_native(compiled, library, *, chains=2, tune=750, draws=500, seed=42):
         lib.set_expand_callback(0)
     if status:
         raise RuntimeError(result)
+    if binary:
+        for name, prefix, width in [
+            ("samples", "samples", len(compiled.initial)),
+            ("expanded_samples", "expanded", result["shape"][2]),
+            ("stats", "stats", 3),
+        ]:
+            pointer = getattr(lib, prefix + "_ptr")
+            length = getattr(lib, prefix + "_len")
+            pointer.restype = C.POINTER(C.c_double)
+            length.restype = C.c_size_t
+            result[name] = np.ctypeslib.as_array(pointer(), shape=(length(),)).copy().reshape(chains, draws, width)
     result.update(
         sampling_seconds=seconds,
         expanded_layout=compiled.expanded_layout,

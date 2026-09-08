@@ -1,0 +1,220 @@
+{
+  "platform": "browser-wasm",
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "bridgeCache": "callbacks",
+  "preparation_wall_seconds": {
+    "reused": 15.621
+  },
+  "runs": [
+    {
+      "mode": "cold",
+      "bridgeCache": "callbacks",
+      "seed": 42,
+      "seconds": 27.402799999976157,
+      "compile_seconds": 19.5674,
+      "sampling_seconds": 7.8353999999761585,
+      "divergences": 0,
+      "max_rhat": 1.0561483019227498,
+      "min_ess": 131.75925497986427,
+      "min_tail_ess": 97.37843593300043,
+      "min_ess_per_second": 16.81589388930561,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3986538898017739,
+        0.19363489501894263
+      ],
+      "logp_evaluations": 77216,
+      "model_compile_seconds": 19.5674,
+      "wall_seconds": 28.594799999952315
+    },
+    {
+      "mode": "cold",
+      "bridgeCache": "callbacks",
+      "seed": 142,
+      "seconds": 21.517499999988082,
+      "compile_seconds": 13.487300000000005,
+      "sampling_seconds": 8.03019999998808,
+      "divergences": 0,
+      "max_rhat": 1.0063276548399447,
+      "min_ess": 231.55662452852332,
+      "min_tail_ess": 194.51252872399976,
+      "min_ess_per_second": 28.835723210986906,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3973660627707774,
+        0.19196081020155437
+      ],
+      "logp_evaluations": 78419,
+      "model_compile_seconds": 13.487300000000005,
+      "wall_seconds": 21.647200000047683
+    },
+    {
+      "mode": "cold",
+      "bridgeCache": "callbacks",
+      "seed": 242,
+      "seconds": 21.773699999976163,
+      "compile_seconds": 13.697300000000006,
+      "sampling_seconds": 8.076399999976157,
+      "divergences": 0,
+      "max_rhat": 1.0199975150852036,
+      "min_ess": 185.52710686882662,
+      "min_tail_ess": 172.50601381011705,
+      "min_ess_per_second": 22.971510434026833,
+      "seasonality": true,
+      "adstock_mean": [
+        0.396271474561785,
+        0.19299859460487565
+      ],
+      "logp_evaluations": 75679,
+      "model_compile_seconds": 13.697300000000006,
+      "wall_seconds": 21.9965
+    },
+    {
+      "mode": "cold",
+      "bridgeCache": "callbacks",
+      "seed": 342,
+      "seconds": 21.591700000023845,
+      "compile_seconds": 13.931600000000003,
+      "sampling_seconds": 7.660100000023842,
+      "divergences": 0,
+      "max_rhat": 1.0126739099058342,
+      "min_ess": 204.55044502809739,
+      "min_tail_ess": 197.56741252542687,
+      "min_ess_per_second": 26.703364842164035,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39644638008280175,
+        0.1883035675862979
+      ],
+      "logp_evaluations": 74813,
+      "model_compile_seconds": 13.931600000000003,
+      "wall_seconds": 21.728199999988078
+    },
+    {
+      "mode": "cold",
+      "bridgeCache": "callbacks",
+      "seed": 442,
+      "seconds": 21.748799999988083,
+      "compile_seconds": 14.235600000000005,
+      "sampling_seconds": 7.513199999988079,
+      "divergences": 0,
+      "max_rhat": 1.008092116367505,
+      "min_ess": 168.8632543534151,
+      "min_tail_ess": 145.15030941030275,
+      "min_ess_per_second": 22.475543623713335,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39704391497571695,
+        0.19055341215901328
+      ],
+      "logp_evaluations": 74126,
+      "model_compile_seconds": 14.235600000000005,
+      "wall_seconds": 21.89589999997616
+    },
+    {
+      "mode": "reused",
+      "bridgeCache": "callbacks",
+      "seed": 42,
+      "seconds": 8.177399999976158,
+      "compile_seconds": 0,
+      "sampling_seconds": 8.177399999976158,
+      "divergences": 0,
+      "max_rhat": 1.0561483019227498,
+      "min_ess": 131.75925497986427,
+      "min_tail_ess": 97.37843593300043,
+      "min_ess_per_second": 16.112609751296063,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3986538898017739,
+        0.19363489501894263
+      ],
+      "logp_evaluations": 77216,
+      "model_compile_seconds": 15.5972,
+      "wall_seconds": 8.336
+    },
+    {
+      "mode": "reused",
+      "bridgeCache": "callbacks",
+      "seed": 142,
+      "seconds": 8.127600000023842,
+      "compile_seconds": 0,
+      "sampling_seconds": 8.127600000023842,
+      "divergences": 0,
+      "max_rhat": 1.0063276548399447,
+      "min_ess": 231.55662452852332,
+      "min_tail_ess": 194.51252872399976,
+      "min_ess_per_second": 28.49016001376102,
+      "seasonality": true,
+      "adstock_mean": [
+        0.3973660627707774,
+        0.19196081020155437
+      ],
+      "logp_evaluations": 78419,
+      "model_compile_seconds": 15.5972,
+      "wall_seconds": 8.276199999988078
+    },
+    {
+      "mode": "reused",
+      "bridgeCache": "callbacks",
+      "seed": 242,
+      "seconds": 7.957199999988079,
+      "compile_seconds": 0,
+      "sampling_seconds": 7.957199999988079,
+      "divergences": 0,
+      "max_rhat": 1.0199975150852036,
+      "min_ess": 185.52710686882662,
+      "min_tail_ess": 172.50601381011705,
+      "min_ess_per_second": 23.315626962889528,
+      "seasonality": true,
+      "adstock_mean": [
+        0.396271474561785,
+        0.19299859460487565
+      ],
+      "logp_evaluations": 75679,
+      "model_compile_seconds": 15.5972,
+      "wall_seconds": 8.085100000023841
+    },
+    {
+      "mode": "reused",
+      "bridgeCache": "callbacks",
+      "seed": 342,
+      "seconds": 7.738199999988079,
+      "compile_seconds": 0,
+      "sampling_seconds": 7.738199999988079,
+      "divergences": 0,
+      "max_rhat": 1.0126739099058342,
+      "min_ess": 204.55044502809739,
+      "min_tail_ess": 197.56741252542687,
+      "min_ess_per_second": 26.43385348380922,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39644638008280175,
+        0.1883035675862979
+      ],
+      "logp_evaluations": 74813,
+      "model_compile_seconds": 15.5972,
+      "wall_seconds": 7.833100000023842
+    },
+    {
+      "mode": "reused",
+      "bridgeCache": "callbacks",
+      "seed": 442,
+      "seconds": 7.7145,
+      "compile_seconds": 0,
+      "sampling_seconds": 7.7145,
+      "divergences": 0,
+      "max_rhat": 1.008092116367505,
+      "min_ess": 168.8632543534151,
+      "min_tail_ess": 145.15030941030275,
+      "min_ess_per_second": 21.889073090079084,
+      "seasonality": true,
+      "adstock_mean": [
+        0.39704391497571695,
+        0.19055341215901328
+      ],
+      "logp_evaluations": 74126,
+      "model_compile_seconds": 15.5972,
+      "wall_seconds": 7.811100000023842
+    }
+  ]
+}
