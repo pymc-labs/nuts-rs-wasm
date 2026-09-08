@@ -1,0 +1,34 @@
+{
+  "adapter_commit": "0be81f7b61282460ba75293e56bd13a1b3e8db0d",
+  "release": "v0.1.0",
+  "files": {
+    "adapter/src/lib.rs": "dcd47eb2fea288f09275166ac29da141af4830f17bd8010f37a29cf00490e908",
+    "compile_model.py": "d937e9ff38fc08f4882f29feaff94b8af3b3b56cf5621e43e701ba72920caa1c",
+    "browser-artifact/nuts_browser_adapter.wasm": "edef2489e075d806e571b76344104e6d67133295b4c7fbb3cc584c549630c866",
+    "browser-artifact/client.mjs": "af8a6bfe0a60b5d1271705d5f32ac5edea006c15719439e440b596a1326c8e71",
+    "worker-loader.js": "71c305302e3d4dbcc2de5786279df7f75cd417d786b2e5aecfb51b9e57571a9d",
+    "examples/mmm/model.py": "241a43a802828db0855ae11001d5b8e049c4069e802dcbdca553c1d38a193d0e",
+    "examples/mmm/diagnostics.py": "fb5ba6a4683951c070cfadfcadb7bf770ebc02caf10fb742a5db2b8919e74ca7",
+    "examples/mmm/mmm_example.csv": "320d299569b989c37facac5bda6a4ee2d661cb12e158ac5d80689c8cc3d37955",
+    "benchmarks/native.py": "d76d546c795641004e0a513f471348a5ac436be05155bd8626ed243a6f9fabf9"
+  },
+  "sampling": {
+    "chains": 2,
+    "tune": 750,
+    "draws": 500,
+    "seeds": [
+      42,
+      142,
+      242,
+      342,
+      442
+    ],
+    "targetAccept": 0.9,
+    "jitter": 1,
+    "maxDepth": 10,
+    "initRetries": 10,
+    "resultFormat": "binary",
+    "retainUnconstrained": true,
+    "bridgeCache": "callbacks"
+  }
+}

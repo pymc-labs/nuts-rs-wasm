@@ -1,6 +1,8 @@
 # nuts-rs-wasm
 
 NUTS sampling in WebAssembly, using **nuts-rs** with a **PyMC/Numba integration**.
+
+[Try the browser MMM](https://pymc-labs.github.io/nuts-rs-wasm/notebook.html) · [Download its notebook](https://pymc-labs.github.io/nuts-rs-wasm/marketing-mix-in-your-browser.ipynb) · [September 8 benchmarks](benchmarks/2026-09-08/README.md)
 Model evaluation, parameter expansion and sampling execute locally in a browser
 worker. No sampling server and no Nutpie Python extension are required.
 

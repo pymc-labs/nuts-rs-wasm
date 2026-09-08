@@ -5,6 +5,8 @@
 <button id="start">Start sampling</button> <button id="stop" disabled>Stop</button>
 <p id="status" role="status">Ready. The runtime loads only when you start.</p><progress id="progress" max="2500" value="0"></progress>
 <p id="count">0 retained draws</p><svg id="plot" viewBox="0 0 800 200" role="img" aria-label="Live adstock posterior histogram"></svg>
+<h2>Compare seasonality assumptions</h2><p id="comparison">Run both variants to compare posterior mean carryover.</p>
+<h2>Posterior predictive check</h2><p id="prediction-status">Shown after sampling. Blue: median and 90% interval; black: observed outcome.</p><svg id="prediction" viewBox="0 0 800 240" role="img" aria-label="Observed outcome and posterior predictive interval"></svg>
 <p id="error" role="alert"></p><pre id="summary" hidden></pre><p id="downloads"></p>
 <details><summary>Python model used for this run</summary><pre id="source"></pre></details>
 <script type="module">
@@ -16,22 +18,30 @@ try{if(location.hash.length>1)config=JSON.parse(decodeURIComponent(location.hash
 const source=config.source??await read('./mmm/model.py');
 el('source').textContent=source;
 el('seasonality').checked=config.seasonality!==false;
-let sampler,urls=[],cancelled=false;
+let sampler,urls=[],cancelled=false;const comparisons={};
+function showPrediction(e){
+ const all=[...e.low,...e.high,...e.observed];if(!all.every(Number.isFinite))throw Error('Invalid prediction');
+ const lo=Math.min(...all),hi=Math.max(...all),x=i=>30+i*740/(e.dates.length-1),y=v=>210-(v-lo)*190/(hi-lo||1);
+ const points=a=>a.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+ const area=points(e.high)+' '+e.low.map((v,i)=>`${x(i)},${y(v)}`).reverse().join(' ');
+ el('prediction').innerHTML=`<polygon points="${area}" fill="#1257d5" opacity=".15"/><polyline points="${points(e.median)}" fill="none" stroke="#1257d5" stroke-width="2"/><polyline points="${points(e.observed)}" fill="none" stroke="#112b40" stroke-width="1"/>`;
+ el('prediction-status').textContent='In-sample check · '+e.dates[0]+' to '+e.dates.at(-1)+' · median and 90% interval';
+}
 el('stop').onclick=()=>{cancelled=true;sampler?.close();};
 el('start').onclick=async()=>{
   el('start').disabled=true;el('stop').disabled=false;el('seasonality').disabled=true;cancelled=false;
-  el('error').textContent='';el('summary').hidden=true;el('downloads').replaceChildren();urls.forEach(URL.revokeObjectURL);urls=[];
+  el('prediction').replaceChildren();el('prediction-status').textContent='Waiting for sampling';el('error').textContent='';el('summary').hidden=true;el('downloads').replaceChildren();urls.forEach(URL.revokeObjectURL);urls=[];
   const values=[[],[]];let retained=0,buffer='';el('count').textContent='0 retained draws';el('plot').replaceChildren();
   sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
   const seasonality=el('seasonality').checked;
   try{
-    const csv=await read('./mmm/mmm_example.csv'),diagnostics=await read('./mmm/diagnostics.py');
+    const csv=await read('./mmm/mmm_example.csv'),diagnostics=await read('./mmm/diagnostics.py'),prediction=await read('./mmm/predict.py');
     const options={chains:2,tune:750,draws:500,seed:42,...config.options};
     el('progress').max=options.chains*(options.tune+options.draws);
     const result=await sampler.sample(`SEASONALITY = ${seasonality?'True':'False'}\n`+source,{
       ...options,files:{'/mmm_example.csv':csv},
       varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution',...(seasonality?['gamma_fourier']:[])],
-      afterSample:diagnostics,
+      afterSample:diagnostics+(config.source?'':'\n'+prediction),
       onPhase:phase=>el('status').textContent=phase,
       onProgress:p=>el('progress').value=p.chain*(options.tune+options.draws)+p.index+1,
       onSamples:b=>{
@@ -43,7 +53,7 @@ el('start').onclick=async()=>{
         const max=Math.max(1,...counts.flat());
         el('plot').innerHTML=counts.map((a,c)=>a.map((n,i)=>`<rect x="${i*20}" y="${180-160*n/max}" width="19" height="${160*n/max}" fill="${c?'#b52b6d':'#1257d5'}" opacity=".5"/>`).join('')).join('');
       },
-      onOutput:text=>{buffer+=text;const lines=buffer.split('\n');buffer=lines.pop();for(const line of lines)if(line.startsWith('MMM_EVENT ')){const event=JSON.parse(line.slice(10));if(event.type==='diagnostics'){el('summary').textContent=JSON.stringify(event,null,2);el('summary').hidden=false;}}},
+      onOutput:text=>{buffer+=text;const lines=buffer.split('\n');buffer=lines.pop();for(const line of lines)if(line.startsWith('MMM_EVENT ')){const event=JSON.parse(line.slice(10));if(event.type==='diagnostics'){el('summary').textContent=JSON.stringify(event,null,2);el('summary').hidden=false;comparisons[seasonality?'With seasonality':'Without seasonality']=event.adstock_mean;el('comparison').textContent=Object.entries(comparisons).map(([label,means])=>label+': '+means.map((v,i)=>'channel '+(i+1)+' = '+v.toFixed(3)).join(', ')).join(' · ');}if(event.type==='prediction')showPrediction(event);}},
     });
     for(const {chain,group,bytes} of result.traces){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes]));urls.push(a.href);a.download=`chain-${chain+1}-${group}.arrow`;a.textContent=a.download;el('downloads').append(a);}
     el('status').textContent='Complete · real posterior draws and Arrow traces';
