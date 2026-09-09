@@ -30,9 +30,9 @@ dependencies:
 - narwhals
 - pyyaml
 - pip:
-  - ./.nblink/wheels/pytensor-3.2.4+wasm.3-py2.py3-none-any.whl
+  - https://raw.githubusercontent.com/pymc-labs/nuts-rs-wasm/c10bf363447adc5f6478b371edf9b1193cbe9771/.nblink/wheels/pytensor-3.2.4+wasm.3-py2.py3-none-any.whl
   - pymc==6.2.0
-  - ./.nblink/wheels/pymc_marketing-1.1.0+wasm.1-py3-none-any.whl
+  - https://raw.githubusercontent.com/pymc-labs/nuts-rs-wasm/c10bf363447adc5f6478b371edf9b1193cbe9771/.nblink/wheels/pymc_marketing-1.1.0+wasm.1-py3-none-any.whl
   - pymc-extras==0.14.0
   - preliz==0.27.1
   - pytensor-distributions==0.2.0
