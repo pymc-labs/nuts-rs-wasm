@@ -1,0 +1,45 @@
+name: nuts-notebook
+channels:
+- https://repo.prefix.dev/emscripten-forge-4x
+- https://repo.prefix.dev/conda-forge
+dependencies:
+- python=3.13
+- xeus-python=0.19.0=py313he5686da_3
+- numpy=2.4
+- scipy
+- numba=0.66.0=py313h02b136b_6
+- llvmlite=0.48.0=py313hb6bfdb0_8
+- pandas
+- matplotlib
+- xarray
+- h5netcdf
+- filelock
+- cachetools<7
+- cloudpickle
+- rich
+- threadpoolctl
+- lazy_loader
+- xarray-einstats
+- typing_extensions
+- pydantic>=2.1,<3
+- scikit-learn
+- patsy
+- seaborn
+- tqdm
+- narwhals
+- pyyaml
+- pip:
+  - setuptools==84.0.0
+  - pytensor==3.2.4
+  - pymc==6.2.0
+  - pymc-marketing==1.1.0
+  - pymc-extras==0.14.0
+  - preliz==0.27.1
+  - pytensor-distributions==0.2.0
+  - better-optimize==0.4.2
+  - pyprojroot==0.3.0
+  - arviz==1.3.0
+  - arviz-base==1.3.0
+  - arviz-stats==1.3.0
+  - arviz-plots[plotly]==1.3.0
+  - plotly==7.0.0
