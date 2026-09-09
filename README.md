@@ -16,8 +16,8 @@ for exact versions, patches, dependency notices and the build recipe.
 
 ## Direct Python notebooks
 
-Open [the tested Notebook.link snapshot](https://notebook.link/github.com/pymc-labs/nuts-rs-wasm/commit/c7685bd0bbaa16d5878b3716028beb8a5879def3/),
-then `examples/direct-kernel.ipynb` and **Run All Cells**. The checked-in
+Open [the browser notebook on Notebook.link](https://notebook.link/github/pymc-labs/nuts-rs-wasm/),
+then `examples/direct-kernel.ipynb` and **Run All Cells**. It includes interactive ArviZ posterior, trace and parameter-pair plots with hover and zoom. The checked-in
 `.nblink` environment and lock include PyMC, PyMC-Marketing and Numba.
 
 ```python
