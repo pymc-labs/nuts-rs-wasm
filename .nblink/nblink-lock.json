@@ -12,7 +12,6 @@
     "matplotlib",
     "xarray",
     "h5netcdf",
-    "setuptools",
     "filelock",
     "cachetools<7",
     "cloudpickle",
@@ -211,18 +210,6 @@
         "sha256": "5bf081c0f21a57fc84b5000d53f043d63638b77dcc2137f87511a4581838c9f6"
       },
       "size": 57732
-    },
-    "setuptools-84.0.0-pyh332efcf_0.conda": {
-      "name": "setuptools",
-      "build": "pyh332efcf_0",
-      "version": "84.0.0",
-      "subdir": "noarch",
-      "channel": "conda-forge",
-      "hash": {
-        "md5": "62ac906f1cd582c6c264c95625cb9d6f",
-        "sha256": "9e200ee5f9ff19a4d94e4b51c4856d53dec849f91032f345cf0c6bc3d51a7183"
-      },
-      "size": 524488
     },
     "filelock-3.32.5-pyhd8ed1ab_0.conda": {
       "name": "filelock",
@@ -702,6 +689,18 @@
         "sha256": "200d39a901f37303007e7a472b591b6da72aedcdc10ae09583a65cd41e2490e0"
       },
       "size": 135456
+    },
+    "setuptools-84.0.0-pyh332efcf_0.conda": {
+      "name": "setuptools",
+      "build": "pyh332efcf_0",
+      "version": "84.0.0",
+      "subdir": "noarch",
+      "channel": "conda-forge",
+      "hash": {
+        "md5": "62ac906f1cd582c6c264c95625cb9d6f",
+        "sha256": "9e200ee5f9ff19a4d94e4b51c4856d53dec849f91032f345cf0c6bc3d51a7183"
+      },
+      "size": 524488
     },
     "requests-2.34.2-pyhcf101f3_0.conda": {
       "name": "requests",
@@ -1240,7 +1239,17 @@
       "hash": {
         "sha256": "5dc61235ff47232207591d6b31d5934036ab70f80b204fd99525051e60fd5ee5"
       }
+    },
+    "setuptools-84.0.0-py3-none-any.whl": {
+      "name": "setuptools",
+      "version": "84.0.0",
+      "url": "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl",
+      "size": 818216,
+      "registry": "PyPi",
+      "hash": {
+        "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
+      }
     }
   },
-  "id": "4533236711923395"
+  "id": "2352432570026559"
 }

@@ -6,6 +6,7 @@ first. MambaJS accepts PyPI specs but not direct wheel requirements in YAML.
 import hashlib
 import json
 from pathlib import Path
+from urllib.request import urlopen
 
 root = Path(__file__).resolve().parents[1]
 p = root / '.nblink/nblink-lock.json'
@@ -18,4 +19,12 @@ for path in sorted((root / '.nblink/wheels').glob('*.whl')):
     package.update(version=version, url=base + path.name, size=path.stat().st_size,
                    hash={'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
     lock['pipPackages'][path.name] = package
+# Notebook.link filters setuptools out of conda assets. Overlay its complete
+# wheel after the conda packages, retaining the solver's dependency records.
+with urlopen('https://pypi.org/pypi/setuptools/84.0.0/json') as response:
+    metadata = json.load(response)
+wheel = next(w for w in metadata['urls'] if w['filename'].endswith('none-any.whl'))
+lock['pipPackages'][wheel['filename']] = dict(name='setuptools', version='84.0.0',
+    url=wheel['url'], size=wheel['size'], registry='PyPi',
+    hash={'sha256': wheel['digests']['sha256']})
 p.write_text(json.dumps(lock, indent=2) + '\n')

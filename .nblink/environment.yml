@@ -13,7 +13,6 @@ dependencies:
 - matplotlib
 - xarray
 - h5netcdf
-- setuptools
 - filelock
 - cachetools<7
 - cloudpickle
@@ -30,6 +29,7 @@ dependencies:
 - narwhals
 - pyyaml
 - pip:
+  - setuptools==84.0.0
   - pytensor==3.2.4
   - pymc==6.2.0
   - pymc-marketing==1.1.0
