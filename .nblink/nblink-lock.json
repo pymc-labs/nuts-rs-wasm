@@ -1220,6 +1220,28 @@
         "sha256": "5ae49e0096e6bf1ed1e0ef56eb17e9a0031ccc660fcf2ee14a08afe9a91cdc0b"
       }
     },
+    "plotly-7.0.0-py3-none-any.whl": {
+      "name": "plotly",
+      "version": "7.0.0",
+      "url": "https://files.pythonhosted.org/packages/e0/2f/6f492108d9955bac97979d9949c1b35eab30fc630b1f22bbdd2c7cacbab4/plotly-7.0.0-py3-none-any.whl",
+      "size": 9052859,
+      "registry": "PyPi",
+      "hash": {
+        "md5": "e8c1b170628e6002a0b815e9af421e03",
+        "sha256": "78cbf7bd06d1b05bb3b8ec1b709864695229b55151b6f7530fbf55517ead6fdd"
+      }
+    },
+    "webcolors-25.10.0-py3-none-any.whl": {
+      "name": "webcolors",
+      "version": "25.10.0",
+      "url": "https://files.pythonhosted.org/packages/e2/cc/e097523dd85c9cf5d354f78310927f1656c422bd7b2613b2db3e3f9a0f2c/webcolors-25.10.0-py3-none-any.whl",
+      "size": 14905,
+      "registry": "PyPi",
+      "hash": {
+        "md5": "5c7471af1f8263c8e822c0807d14c973",
+        "sha256": "032c727334856fc0b968f63daa252a1ac93d33db2f5267756623c210e57a4f1d"
+      }
+    },
     "pymc_marketing-1.1.0+wasm.1-py3-none-any.whl": {
       "name": "pymc-marketing",
       "version": "1.1.0+wasm.1",
@@ -1249,29 +1271,7 @@
       "hash": {
         "sha256": "51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670"
       }
-    },
-    "plotly-7.0.0-py3-none-any.whl": {
-      "name": "plotly",
-      "version": "7.0.0",
-      "url": "https://files.pythonhosted.org/packages/e0/2f/6f492108d9955bac97979d9949c1b35eab30fc630b1f22bbdd2c7cacbab4/plotly-7.0.0-py3-none-any.whl",
-      "size": 9052859,
-      "registry": "PyPi",
-      "hash": {
-        "md5": "e8c1b170628e6002a0b815e9af421e03",
-        "sha256": "78cbf7bd06d1b05bb3b8ec1b709864695229b55151b6f7530fbf55517ead6fdd"
-      }
-    },
-    "webcolors-25.10.0-py3-none-any.whl": {
-      "name": "webcolors",
-      "version": "25.10.0",
-      "url": "https://files.pythonhosted.org/packages/e2/cc/e097523dd85c9cf5d354f78310927f1656c422bd7b2613b2db3e3f9a0f2c/webcolors-25.10.0-py3-none-any.whl",
-      "size": 14905,
-      "registry": "PyPi",
-      "hash": {
-        "md5": "5c7471af1f8263c8e822c0807d14c973",
-        "sha256": "032c727334856fc0b968f63daa252a1ac93d33db2f5267756623c210e57a4f1d"
-      }
     }
   },
-  "id": "2352432570026559"
+  "id": "1782025235154039"
 }
