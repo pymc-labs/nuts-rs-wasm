@@ -14,6 +14,38 @@ Open http://localhost:8000/ to sample the MMM or download its editable notebook.
 No local PyMC installation is required. See [runtime-profile](runtime-profile/)
 for exact versions, patches, dependency notices and the build recipe.
 
+## Direct Python notebooks
+
+Open [the tested Notebook.link snapshot](https://notebook.link/github.com/pymc-labs/nuts-rs-wasm/commit/c7685bd0bbaa16d5878b3716028beb8a5879def3/),
+then `examples/direct-kernel.ipynb` and **Run All Cells**. The checked-in
+`.nblink` environment and lock include PyMC, PyMC-Marketing and Numba.
+
+```python
+from notebook_sampler import sample
+
+# model is an ordinary PyMC model created in an earlier notebook cell.
+idata = await sample(model, chains=2, tune=750, draws=500)
+idata.posterior
+```
+
+This experimental entry point compiles and samples in the existing Xeus-Python
+kernel and returns an xarray DataTree with posterior and sample statistics.
+It reuses `compile_browser_model`, the Rust bridge and binary result conversion.
+It starts no iframe or second Python runtime. The earlier companion notebook
+remains available as an iframe wrapper for ordinary local Jupyter installations.
+
+The first call restores a checksum-verified setuptools wheel because Notebook.link
+filters files that PyTensor needs. Sampling occupies the kernel until it finishes;
+this entry point currently provides final results rather than live chart updates
+or Arrow downloads. Use the JavaScript client for those features. The Rust bridge
+and WASM binary are loaded from the hosted v0.1.0 demo; `asset_url` can point to a
+self-hosted compatible copy. Setup/download time is separate from the returned
+`compile_seconds` and `sampling_seconds` attributes.
+
+To regenerate the environment lock, use MambaJS 0.22.0:
+`mambajs create-lock .nblink/environment.yml .nblink/nblink-lock.json`, then
+`python scripts/lock_notebook.py` to pin the audited WASM backports.
+
 ## Sample a PyMC model from JavaScript
 
 ```javascript

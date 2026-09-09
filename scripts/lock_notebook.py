@@ -26,8 +26,8 @@ for path in sorted((root / ".nblink/wheels").glob("*.whl")):
         hash={"sha256": hashlib.sha256(path.read_bytes()).hexdigest()},
     )
     lock["pipPackages"][path.name] = package
-# Notebook.link filters setuptools out of conda assets. Overlay its complete
-# wheel after the conda packages, retaining the solver's dependency records.
+# Record the complete setuptools wheel for notebook_setup.py. Notebook.link
+# filters its code even from pip assets; the helper verifies and restores it.
 with urlopen("https://pypi.org/pypi/setuptools/84.0.0/json") as response:
     metadata = json.load(response)
 wheel = next(w for w in metadata["urls"] if w["filename"].endswith("none-any.whl"))
