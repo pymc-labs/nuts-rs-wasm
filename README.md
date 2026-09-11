@@ -171,6 +171,10 @@ standalone runtime installer.
 
 ## Reuse of existing implementations
 
+See the [Nutpie reuse proposal](docs/nutpie-reuse.md) for the remaining overlap in
+model compilation, initialization and result conversion, and a staged plan to
+share that code while retaining the necessary browser integration.
+
 - **PyMC** provides the backward transformations and deterministic expressions
   through `model.unobserved_value_vars`. Like Nutpie's `_make_functions`, we
   compile these expressions into a separate expansion callback. There are no
