@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>Precompiled normal model — tapewasm</title>
+<style>body{font:18px system-ui;max-width:700px;margin:4rem auto;padding:0 1rem}button{font:inherit}pre{white-space:pre-wrap}</style>
+<h1>Sample a precompiled normal model</h1>
+<p>This example loads a model and sampler as WebAssembly. Sampling runs locally without Python.</p>
+<button id="start">Sample</button> <button id="stop" disabled>Cancel</button>
+<pre id="output">Ready. Expected mean: 0; standard deviation: 1.</pre>
+<script type="module">
+import {createSampler} from '../client.mjs';
+const sampler = createSampler({backend:'tapewasm',
+  moduleUrl:new URL('../node_modules/tapewasm/index.js',import.meta.url),
+  wasmUrl:new URL('../node_modules/tapewasm/pkg/tapewasm_bg.wasm',import.meta.url)});
+const start=document.querySelector('#start'), stop=document.querySelector('#stop'), output=document.querySelector('#output');
+let controller;
+start.onclick=async()=>{
+  controller=new AbortController();start.disabled=true;stop.disabled=false;output.textContent='Sampling…';
+  try {
+    const r=await sampler.sample({wasmUrl:new URL('../tests/fixtures/tapewasm/normal.wasm',import.meta.url),
+      metadataUrl:new URL('../tests/fixtures/tapewasm/normal.json',import.meta.url)},
+      {chains:2,tune:500,draws:1000,resultFormat:'binary',initialPositions:[[.4],[-.4]],signal:controller.signal});
+    const mean=r.samples.reduce((a,b)=>a+b,0)/r.samples.length;
+    const sd=Math.sqrt(r.samples.reduce((a,b)=>a+(b-mean)**2,0)/r.samples.length);
+    output.textContent=`${r.samples.length} draws\nMean: ${mean.toFixed(3)}\nSD: ${sd.toFixed(3)}\nSampling: ${r.sampling_seconds.toFixed(3)} s`;
+  } catch(e){output.textContent=e.name==='AbortError'?'Cancelled.':e.message;}
+  finally{start.disabled=false;stop.disabled=true;}
+};
+stop.onclick=()=>controller?.abort();
+addEventListener('pagehide',()=>sampler.close());
+</script>
+</html>

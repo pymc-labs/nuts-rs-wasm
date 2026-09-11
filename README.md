@@ -14,6 +14,14 @@ Open http://localhost:8000/ to sample the MMM or download its editable notebook.
 No local PyMC installation is required. See [runtime-profile](runtime-profile/)
 for exact versions, patches, dependency notices and the build recipe.
 
+## Experimental tapewasm backend
+
+For supported models compiled beforehand, `createSampler({backend: 'tapewasm',
+moduleUrl, wasmUrl})` can sample without loading Python or Numba. It uses a
+separately hosted tapewasm runtime and returns unconstrained draws only.
+Numba remains the default. See [setup, artifact format and API limits](docs/tapewasm.md)
+and the [small runnable example](examples/tapewasm.html).
+
 ## Direct Python notebooks
 
 Open [the browser notebook on Notebook.link](https://notebook.link/github/pymc-labs/nuts-rs-wasm/),
