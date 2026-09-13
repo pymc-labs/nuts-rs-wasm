@@ -1,9 +1,9 @@
 <!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PyMC MMM · WASM notebook</title>
-<style>body{font:16px/1.6 system-ui,sans-serif;color:#112b40;margin:24px;max-width:960px}button{font:inherit;background:#1257d5;color:white;border:0;border-radius:6px;padding:12px 20px;cursor:pointer}button:disabled{opacity:.6}button+button{background:#526576}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f5fc;padding:16px;font-size:13px}a{color:#1257d5;margin-right:16px}progress{width:100%}svg{width:100%;height:auto}label{display:block;margin:15px 0}h1{font-size:25px}#error{color:#a52222}</style>
+<style>body{font:16px/1.6 system-ui,sans-serif;color:#112b40;margin:24px;max-width:960px}button{font:inherit;background:#1257d5;color:white;border:0;border-radius:6px;padding:12px 20px;cursor:pointer}button:disabled{opacity:.6}button+button{background:#526576}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f5fc;padding:16px;font-size:13px}a{color:#1257d5;margin-right:16px}progress{width:100%}svg{width:100%;height:auto}label{display:block;margin:15px 0}h1{font-size:25px}#error{color:#a52222}#activity{display:flex;align-items:center;gap:10px;min-height:3em}#status{margin:0}#spinner{width:20px;height:20px;border:3px solid #dce7f8;border-top-color:#1257d5;border-radius:50%;animation:spin .9s linear infinite;flex:none}#spinner[hidden]{display:none}#elapsed{color:#526576;font-size:14px;white-space:nowrap}@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){#spinner{animation:none}}</style>
 <h1>Marketing mix · sampled in this browser</h1><p>The notebook and demo use the same nuts-rs-wasm adapter, transformations and Arrow storage.</p>
 <label><input id="seasonality" type="checkbox" checked> Include yearly seasonality</label>
 <button id="start">Start sampling</button> <button id="stop" disabled>Stop</button>
-<p id="status" role="status">Ready. The runtime loads only when you start.</p><progress id="progress" max="2500" value="0"></progress>
+<div id="activity"><span id="spinner" hidden aria-hidden="true"></span><p id="status" role="status">Ready. The runtime loads only when you start.</p><span id="elapsed"></span></div><progress id="progress" aria-label="Warmup and sampling progress" max="2500" value="0"></progress>
 <p id="count">0 retained draws</p><svg id="plot" viewBox="0 0 800 200" role="img" aria-label="Live adstock posterior histogram"></svg>
 <h2>Compare seasonality assumptions</h2><p id="comparison">Run both variants to compare posterior mean carryover.</p>
 <h2>Posterior predictive check</h2><p id="prediction-status">Shown after sampling. Blue: median and 90% interval; black: observed outcome.</p><svg id="prediction" viewBox="0 0 800 240" role="img" aria-label="Observed outcome and posterior predictive interval"></svg>
@@ -27,23 +27,35 @@ function showPrediction(e){
  el('prediction').innerHTML=`<polygon points="${area}" fill="#1257d5" opacity=".15"/><polyline points="${points(e.median)}" fill="none" stroke="#1257d5" stroke-width="2"/><polyline points="${points(e.observed)}" fill="none" stroke="#112b40" stroke-width="1"/>`;
  el('prediction-status').textContent='In-sample check · '+e.dates[0]+' to '+e.dates.at(-1)+' · median and 90% interval';
 }
+function setPhase(phase){
+ el('status').textContent=phase;
+ el('progress').removeAttribute('value');
+ el('progress').setAttribute('aria-label',phase);
+ el('start').textContent=phase==='Sampling with Rust NUTS'?'Sampling…':'Preparing…';
+}
 el('stop').onclick=()=>{cancelled=true;sampler?.close();};
 el('start').onclick=async()=>{
+  const started=performance.now();
+  el('spinner').hidden=false;el('elapsed').textContent='0 s';
+  const timer=setInterval(()=>{el('elapsed').textContent=Math.floor((performance.now()-started)/1000)+' s';},1000);
+  setPhase('Loading example data… Please wait; the first run also downloads the Python environment.');
   el('start').disabled=true;el('stop').disabled=false;el('seasonality').disabled=true;cancelled=false;
   el('prediction').replaceChildren();el('prediction-status').textContent='Waiting for sampling';el('error').textContent='';el('summary').hidden=true;el('downloads').replaceChildren();urls.forEach(URL.revokeObjectURL);urls=[];
   const values=[[],[]];let retained=0,buffer='';el('count').textContent='0 retained draws';el('plot').replaceChildren();
-  sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
+
   const seasonality=el('seasonality').checked;
   try{
+    sampler=createSampler({runtimeUrl:new URL('./runtime/',location.href).href,environment:'pymc-marketing-wasm'});
     const csv=await read('./mmm/mmm_example.csv'),diagnostics=await read('./mmm/diagnostics.py'),prediction=await read('./mmm/predict.py');
+    if(cancelled)throw Error('Stopped');
     const options={chains:2,tune:750,draws:500,seed:42,...config.options};
     el('progress').max=options.chains*(options.tune+options.draws);
     const result=await sampler.sample(`SEASONALITY = ${seasonality?'True':'False'}\n`+source,{
       ...options,files:{'/mmm_example.csv':csv},
       varNames:['adstock_alpha','saturation_lam','saturation_beta','gamma_control','y_sigma','intercept_contribution',...(seasonality?['gamma_fourier']:[])],
       afterSample:diagnostics+(config.source?'':'\n'+prediction),
-      onPhase:phase=>el('status').textContent=phase,
-      onProgress:p=>el('progress').value=p.chain*(options.tune+options.draws)+p.index+1,
+      onPhase:phase=>setPhase(phase==='Loading browser runtime'?'Loading Python environment… The first run can take a minute or more.':phase),
+      onProgress:p=>{el('progress').setAttribute('aria-label','Warmup and sampling progress');el('progress').value=p.chain*(options.tune+options.draws)+p.index+1;},
       onSamples:b=>{
         retained+=b.draws;el('count').textContent=`${retained} retained draws`;
         let offset=0;for(const v of b.layout){if(v.name==='adstock_alpha')break;offset+=v.size;}
@@ -56,8 +68,9 @@ el('start').onclick=async()=>{
       onOutput:text=>{buffer+=text;const lines=buffer.split('\n');buffer=lines.pop();for(const line of lines)if(line.startsWith('MMM_EVENT ')){const event=JSON.parse(line.slice(10));if(event.type==='diagnostics'){el('summary').textContent=JSON.stringify(event,null,2);el('summary').hidden=false;comparisons[seasonality?'With seasonality':'Without seasonality']=event.adstock_mean;el('comparison').textContent=Object.entries(comparisons).map(([label,means])=>label+': '+means.map((v,i)=>'channel '+(i+1)+' = '+v.toFixed(3)).join(', ')).join(' · ');}if(event.type==='prediction')showPrediction(event);}},
     });
     for(const {chain,group,bytes} of result.traces){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes]));urls.push(a.href);a.download=`chain-${chain+1}-${group}.arrow`;a.textContent=a.download;el('downloads').append(a);}
+    el('progress').value=el('progress').max;
     el('status').textContent='Complete · real posterior draws and Arrow traces';
-  }catch(e){el('status').textContent=cancelled?'Stopped':'Could not finish';if(!cancelled)el('error').textContent=String(e);}
-  finally{sampler?.close();el('start').disabled=false;el('stop').disabled=true;el('seasonality').disabled=false;}
+  }catch(e){el('status').textContent=cancelled?'Stopped':'Could not finish';if(!el('progress').hasAttribute('value'))el('progress').value=0;if(!cancelled)el('error').textContent=String(e);}
+  finally{el('progress').setAttribute('aria-label',el('status').textContent);clearInterval(timer);el('spinner').hidden=true;el('start').textContent='Start sampling';sampler?.close();el('start').disabled=false;el('stop').disabled=true;el('seasonality').disabled=false;}
 };
 </script>
