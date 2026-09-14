@@ -1,6 +1,12 @@
 /** High-level browser client. Model code is trusted Python executed locally. */
+import {TapewasmSampler} from './tapewasm-client.mjs';
 const cancelled = () => new DOMException('Sampling cancelled', 'AbortError');
-export function createSampler(options) {return new BrowserSampler(options);}
+export function createSampler(options = {}) {
+  const {backend = 'numba', ...config} = options;
+  if (backend === 'tapewasm') return new TapewasmSampler(config);
+  if (backend !== 'numba') throw Error(`Unknown sampling backend: ${backend}`);
+  return new BrowserSampler(config);
+}
 export class BrowserSampler {
   constructor({runtimeUrl, environment, assetsUrl = new URL('./', import.meta.url),
     wrap, comlinkUrl = new URL('./comlink.mjs', import.meta.url), loadTimeout = 300000}) {
